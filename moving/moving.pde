@@ -106,7 +106,7 @@ void line3D(Vector3D p1, Vector3D p2) {
 
 void draw(){;
   t += 1;
-  background(0);
+  background(255);
   translate(width/2, height/2);
   
   int s = 50;
