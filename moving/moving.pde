@@ -124,7 +124,7 @@ void draw(){;
   Vector3D p6 = new Vector3D(-s, s, -s);
   Vector3D p7 = new Vector3D(s, s, -s);
   Vector3D p8 = new Vector3D(s, -s, -s);
-  stroke(255);
+  stroke(0);
   strokeWeight(3);
   line3D(p1, p2);
   line3D(p2, p3);

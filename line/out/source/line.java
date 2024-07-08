@@ -4,8 +4,6 @@ import processing.data.*;
 import processing.event.*;
 import processing.opengl.*;
 
-import processing.core.PApplet;
-
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.io.File;
@@ -15,41 +13,36 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.IOException;
 
+public class line extends PApplet {
 
-
-public class LineVisualization extends PApplet {
-  
-  float[][] coordinates;
-  
-  public void settings() {
-  size(800, 600, P3D);
-  }
-  
-  public void setup() {
-  // Initialize the coordinates array with your data
-  coordinates = new float[][] {
-    {0, 0, 0},
-    {100, 100, 100},
-    {200, 200, 200},
-    // Add more coordinates here
-  };
-  }
-  
-  public void draw() {
-  background(0);
-  translate(width/2, height/2, 0);
-  
-  // Draw lines between consecutive coordinates
-  for (int i = 0; i < coordinates.length - 1; i++) {
-    float[] start = coordinates[i];
-    float[] end = coordinates[i + 1];
-    
-    line(start[0], start[1], start[2], end[0], end[1], end[2]);
-  }
-  }
-  
-  public static void main(String[] args) {
-  PApplet.main("LineVisualization");
-  }
+public void setup(){
+    /* size commented out by preprocessor */;
+    frameRate(60);
 }
 
+int basetime = 0;
+
+public void draw(){
+    int time = millis()-basetime;
+    background(255);
+    camera(200,200,200,0,0,0,0,0,-1);
+    
+    int [][] data3D = {{0,0,0},{100,100,100}};
+    line(data3D[0][0], data3D[0][1], data3D[0][2], data3D[1][0], data3D[0][1], data3D[0][2]);
+    line(data3D[0][0], data3D[0][1], data3D[0][2], data3D[0][0], data3D[1][1], data3D[0][2]);
+    line(data3D[0][0], data3D[0][1], data3D[0][2], data3D[0][0], data3D[0][1], data3D[1][2]);
+    line(data3D[0][0],data3D[0][1], data3D[0][2],0,0.01f*time,0.01f*time);
+}
+
+
+  public void settings() { size(800, 800, P3D); }
+
+  static public void main(String[] passedArgs) {
+    String[] appletArgs = new String[] { "line" };
+    if (passedArgs != null) {
+      PApplet.main(concat(appletArgs, passedArgs));
+    } else {
+      PApplet.main(appletArgs);
+    }
+  }
+}
