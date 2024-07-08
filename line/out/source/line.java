@@ -31,7 +31,10 @@ public void draw(){
     line(data3D[0][0], data3D[0][1], data3D[0][2], data3D[1][0], data3D[0][1], data3D[0][2]);
     line(data3D[0][0], data3D[0][1], data3D[0][2], data3D[0][0], data3D[1][1], data3D[0][2]);
     line(data3D[0][0], data3D[0][1], data3D[0][2], data3D[0][0], data3D[0][1], data3D[1][2]);
-    line(data3D[0][0],data3D[0][1], data3D[0][2],0,0.01f*time,0.01f*time);
+    line(data3D[0][0],data3D[0][1], data3D[0][2],0,100*sin(0.01f*time),100*cos(0.01f*time));
+    if(time>10000){
+        basetime = millis();
+    }
 }
 
 
