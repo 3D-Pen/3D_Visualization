@@ -10,7 +10,6 @@ float[][] MatrixMul(float A[][], float B[][]) {
   return Mat;
 }
 
-//回転行列
 float[][] MatrixI() {
   float [][] Mat = new float [4][4];
   Mat[0][0] = 1;
@@ -77,6 +76,7 @@ void printMatrix(float[][] mat) {
   }
 }
 
+
 class Vector3D {
   float x, y, z;
   Vector3D(float _x, float _y, float _z) {
@@ -104,20 +104,15 @@ void line3D(Vector3D p1, Vector3D p2) {
   line(a1.x, a1.y, a2.x, a2.y);
 }
 
-void setup() {
-  size(750, 750);
-  frameRate(50); // 50fpsでアニメーションする
-}
-
 void draw(){;
   t += 1;
-  background(255);
+  background(0);
   translate(width/2, height/2);
   
-  int s = 100;
+  int s = 50;
   transformMatrix = MatrixI();
-  float mat1[][] = MatrixRotateX(PI/4);
-  float mat2[][] = MatrixRotateY(PI/4);
+  float mat1[][] = MatrixRotateX(t*0.1);
+  float mat2[][] = MatrixRotateY(t*0.1);
   transformMatrix = MatrixMul(mat2, transformMatrix);
   transformMatrix = MatrixMul(mat1, transformMatrix);
 
@@ -129,7 +124,7 @@ void draw(){;
   Vector3D p6 = new Vector3D(-s, s, -s);
   Vector3D p7 = new Vector3D(s, s, -s);
   Vector3D p8 = new Vector3D(s, -s, -s);
-  stroke(35);
+  stroke(255);
   strokeWeight(3);
   line3D(p1, p2);
   line3D(p2, p3);
