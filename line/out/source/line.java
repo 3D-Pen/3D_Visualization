@@ -17,24 +17,17 @@ public class line extends PApplet {
 
 public void setup(){
     /* size commented out by preprocessor */;
-    frameRate(60);
-}
-
-int basetime = 0;
-
-public void draw(){
-    int time = millis()-basetime;
     background(255);
     camera(200,200,200,0,0,0,0,0,-1);
-    
+}
+float t=0;
+public void draw(){
     int [][] data3D = {{0,0,0},{100,100,100}};
     line(data3D[0][0], data3D[0][1], data3D[0][2], data3D[1][0], data3D[0][1], data3D[0][2]);
     line(data3D[0][0], data3D[0][1], data3D[0][2], data3D[0][0], data3D[1][1], data3D[0][2]);
     line(data3D[0][0], data3D[0][1], data3D[0][2], data3D[0][0], data3D[0][1], data3D[1][2]);
-    line(data3D[0][0],data3D[0][1], data3D[0][2],0,100*sin(0.01f*time),100*cos(0.01f*time));
-    if(time>10000){
-        basetime = millis();
-    }
+    line(data3D[0][0],data3D[0][1], data3D[0][2],0,100*sin(0.01f*t),100*cos(0.01f*t));
+    t+=1;
 }
 
 
