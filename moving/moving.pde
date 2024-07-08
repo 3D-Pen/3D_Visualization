@@ -116,8 +116,8 @@ void draw(){;
   
   int s = 100;
   transformMatrix = MatrixI();
-  float mat1[][] = MatrixRotateX(t*0.1);
-  float mat2[][] = MatrixRotateY(t*0.1);
+  float mat1[][] = MatrixRotateX(PI/4);
+  float mat2[][] = MatrixRotateY(PI/4);
   transformMatrix = MatrixMul(mat2, transformMatrix);
   transformMatrix = MatrixMul(mat1, transformMatrix);
 
