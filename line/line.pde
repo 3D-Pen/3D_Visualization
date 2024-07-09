@@ -9,6 +9,6 @@ void draw(){
     line(data3D[0][0], data3D[0][1], data3D[0][2], data3D[1][0], data3D[0][1], data3D[0][2]);
     line(data3D[0][0], data3D[0][1], data3D[0][2], data3D[0][0], data3D[1][1], data3D[0][2]);
     line(data3D[0][0], data3D[0][1], data3D[0][2], data3D[0][0], data3D[0][1], data3D[1][2]);
-    line(data3D[0][0],data3D[0][1], data3D[0][2],0,100*sin(0.01*t),100*cos(0.01*t));
+    line(0.1*(t-1),100*sin(0.01*(t-1)),100*cos(0.01*(t-1)),0.1*t,100*sin(0.01*t),100*cos(0.01*t));
     t+=1;
 }
