@@ -21,22 +21,25 @@ public void setup(){
     camera(200,200,200,0,0,0,0,0,-1);
 }
 
-float [1001][3] data3D = {{0,0,0}};
-float t=1;
+int NUM=100;
+
+PVector [] location = new PVector[NUM];
+PVector [] velocity = new PVector[NUM];
+int t=1;
 
 public void draw(){
-    int [][] axis = {{0,0,0},{100,100,100}};
-    data3D[t][0]=random(0,100);
-    data3D[t][1]=random(0,100);
-    data3D[t][2]=random(0,100);
+    location[0] = new PVector(100,100,100);
+    velocity[t-1] = new PVector(random(-5,5),random(-5,5),random(-5,5));
+    location[t] = new PVector(location[t-1].x+velocity[t-1].x, location[t-1].y+velocity[t-1].y, location[t-1].z+velocity[t-1].z);
 
+    int [][] axis = {{0,0,0},{150,150,150}};
     line(axis[0][0], axis[0][1], axis[0][2], axis[1][0], axis[0][1], axis[0][2]);
     line(axis[0][0], axis[0][1], axis[0][2], axis[0][0], axis[1][1], axis[0][2]);
     line(axis[0][0], axis[0][1], axis[0][2], axis[0][0], axis[0][1], axis[1][2]);
-    line(data3D[t-1][0], data3D[t-1][1], data3D[t-1][2], data3D[t][0], data3D[t][1], data3D[t][2]);
-    t+=1;
-
-    if(t>=1000){
+    line(location[t-1].x,location[t-1].y,location[t-1].z, location[t].x, location[t].y, location[t].z);
+    t++;
+    delay(100);
+    if(t>=NUM-1){
         noLoop();
     }
 }
