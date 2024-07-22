@@ -5,6 +5,7 @@ int loopCount;
 PVector[] start = new PVector[NUM];
 PVector[] end = new PVector[NUM];
 
+
 void setup() {
 size(800, 600, P3D);
 loopCount=0;
@@ -13,7 +14,6 @@ background(0);
 stroke(255);
 hint(ENABLE_DEPTH_SORT);
 }
-
 void draw() {
 
 loopCount++;
