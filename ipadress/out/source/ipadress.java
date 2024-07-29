@@ -33,7 +33,7 @@ public void draw() {
   if (client !=null) {
     String whatClientSaid = client.readString();
     if (whatClientSaid != null) {
-      println(whatClientSaid); // Pythonからのメッセージを出力
+      print(whatClientSaid); // Pythonからのメッセージを出力
     } 
   } 
 }

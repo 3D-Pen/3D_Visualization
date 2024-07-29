@@ -11,4 +11,4 @@ if __name__ == '__main__':
     socket_client.connect((host, port))                               #サーバに接続
 
     #socket_client.send('送信するメッセージ')                #データを送信 Python2
-    socket_client.send('送信するメッセージ'.encode('utf-8')) #データを送信 Python3
+    socket_client.send('{1,2,3}'.encode('utf-8')) #データを送信 Python3
