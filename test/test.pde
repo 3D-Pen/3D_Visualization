@@ -13,6 +13,7 @@ float xc, yc, zc;
 float pxc, pyc, pzc;
 float s;
 
+
 void setup() {
 size(800, 600, P3D);
 start[0] = new PVector(random(-200, 200), random(-200, 200), random(-200, 200));
