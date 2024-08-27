@@ -1,7 +1,7 @@
 int base_time = 0;
-int NUM = 100;
+int NUM = 1000;
 int i = 0;
-int Countloop = 0;
+//int Countloop = 0;
 PVector[] start = new PVector[NUM];
 PVector[] end = new PVector[NUM];
 
@@ -24,11 +24,12 @@ lights();
 PFont font = createFont("MS Mincho", 48, true);
 textFont(font);
 textSize(54);
+frameRate(30);
 
-px = 0;
-pz = 0;
+px = PI/6;
+pz = PI/6;
 xx = PI/6;
-zz = 0;
+zz = PI/6;
 xc = 0;
 yc = 0;
 zc = 0;
@@ -38,11 +39,15 @@ s = 1;
 void draw() {
 background(0);
 translate(width/2, height/2,0);
-//rotateX(PI/2);
-//camera(100,0,600,0,0,0,0,0,-1);
-//camera(400*cos(radians(Countloop)), 400*sin(radians(Countloop)), 400, 0, 0, 0, 0, 0, -1);
 //Countloop+=PI/6;
-camera(400*cos(xx), 400*sin(xx), 350, xc, yc, 0, 0, 0, -1);
+if(sin(zz) >= 0){
+    camera(500*cos(xx)*sin(zz), 500*sin(xx)*sin(zz), 500*cos(zz), xc, yc, 0, 0, 0, -1);
+}
+else {
+    camera(500*cos(xx)*sin(zz), 500*sin(xx)*sin(zz), 500*cos(zz), xc, yc, 0, 0, 0, 1);
+}
+
+
 rotateX(0);
 rotateY(0);
 scale(s);
@@ -57,12 +62,15 @@ line(0, 0, 0, 0, 0, 160); // Z軸
 
 
 int time = millis() - base_time;
+for (int k = 0; k < i; k++){
+    line(start[k].x, start[k].y, start[k].z, end[k].x, end[k].y, end[k].z);
+}
+println(end[0]);
 
 
 
-
-//if (time >= 2000) {
-    if(i >= 100){
+if (time >= 1000) {
+    if(i >= 1000){
         exit();
     }
     i++;
@@ -70,13 +78,13 @@ int time = millis() - base_time;
     start[i] = end[i - 1];
 
 
-    for (int k = 0; k < i; k++){
-        line(start[k].x, start[k].y, start[k].z, end[k].x, end[k].y, end[k].z);
+    //for (int k = 0; k < i; k++){
+        //line(start[k].x, start[k].y, start[k].z, end[k].x, end[k].y, end[k].z);
+    //}
+    //delay(100);
+    base_time = millis();
     }
-    delay(500);
-    //base_time = millis();
-    }
-//}
+}
 void mouseDragged(){
     if(mouseButton == LEFT){
         if(mouseX-pmouseX >= 0){
@@ -89,15 +97,15 @@ void mouseDragged(){
         px = xx;
         
         if(mouseY-pmouseY >= 0){
-            zz = map(mouseY-pmouseY, 0, height, 0, PI);
+            zz = map(mouseY-pmouseY, 0, height, 0, 2*PI);
         }
         if(mouseY-pmouseY <= 0){
-            zz = map(mouseY-pmouseY, -height, 0, PI, 0);
+            zz = map(mouseY-pmouseY, -height, 0, -2*PI, 0);
         }
         //println("zz",zz);
         zz += pz;
         pz = zz;
-        //println("zz",zz);
+        //println("zz",cos(zz));
     }
     
     if(mouseButton == CENTER){
