@@ -65,9 +65,6 @@ int time = millis() - base_time;
 for (int k = 0; k < i; k++){
     line(start[k].x, start[k].y, start[k].z, end[k].x, end[k].y, end[k].z);
 }
-println(end[0]);
-
-
 
 if (time >= 1000) {
     if(i >= 1000){
