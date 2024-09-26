@@ -9,7 +9,7 @@ String lines[];         //テキスト全体を読み込む文字列
 int head = 0;           //直線の始まりを記録する
 
 float xx;               //
-float zz;               //
+float zz;               //wwwww
 float px, pz;           //
 float rotX,rotY,protY;  //マウスで座標を記録する値
 float xc, yc, zc;       //
