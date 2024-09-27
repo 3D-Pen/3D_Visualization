@@ -78,27 +78,13 @@ void draw() {
             if(i >= 1000){          //1000個以上直線を描いたら終了
                 exit();
             }
-            if(head == 0){      //始まりの座標
-                start[i] = new PVector(int(co[1]),int(co[2]),int(co[3]));
-                head = 1;
-            }
-            else{
-                end[i] = new PVector(int(co[1]),int(co[2]),int(co[3]));
-                start[i + 1] = end[i];
-                i++;
-            }
+            start[i] = new PVector(int(co[1]),int(co[2]),int(co[3]));
+            end[i] = new PVector(int(co[4]),int(co[5]),int(co[6]));
+            i++;
             ln++;       //1行増やす
             base_time = millis();
-        }
-    }
-    else if(unhex(co[0]) == 4369){      //co[0]が1111なら
-        if(time >= 200){
-            end[i] = new PVector(int(co[1]),int(co[2]),int(co[3]));     //最後の座標
-        i++;
-        ln++;
-        head = 0;
-        base_time = millis();
-        }
+            }
+
     }
     else{
         //何もしない
