@@ -6,7 +6,6 @@ PVector[] end = new PVector[NUM];       //直線の終わりの座標
 String lin;             //テキストで読み込んだ任意の行の文字列
 int ln;                 //行数
 String lines[];         //テキスト全体を読み込む文字列
-int head = 0;           //直線の始まりを記録する
 
 float xx;               //
 float zz;               //
