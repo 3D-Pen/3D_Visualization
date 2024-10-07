@@ -1,5 +1,5 @@
 int base_time = 0;      //一定時間ごとにmillis()を初期化
-int NUM = 1000;         //描ける直線の総数
+int NUM = 10000;         //描ける直線の総数
 int i = 0;              //直線の数
 PVector[] start = new PVector[NUM];     //直線の始まりの座標
 PVector[] end = new PVector[NUM];       //直線の終わりの座標
@@ -14,6 +14,8 @@ float rotX,rotY,protY;  //マウスで座標を記録する値
 float xc, yc, zc;       //
 float pxc, pyc, pzc;    //
 float s;                //
+PrintWriter file;
+int jump = 9999;
 
 
 void setup() {
@@ -35,6 +37,7 @@ void setup() {
     yc = 0;             //
     zc = 0;             //
     s = 1;              //
+    file = createWriter("test.csv");
 }
 
 void draw() {
@@ -71,10 +74,13 @@ void draw() {
         //何もしない
     }
     lin = lines[ln];        //linに任意の行の文字列を代入
-    String[] co = split(lin, ',');      //コンマで区切ってcoに代入gggg
+    String[] co = split(lin, ',');      //コンマで区切ってcoに代入
+    if(unhex(co[0]) == 43690){
+        return;
+    }
     if(unhex(co[0]) == 65535){      //co[0]がFFFFなら
         if (time >= 200) {          //0.2秒ずつ
-            if(i >= 1000){          //1000個以上直線を描いたら終了
+            if(i >= 10000){          //10000個以上直線を描いたら終了
                 exit();
             }
             start[i] = new PVector(int(co[1]),int(co[2]),int(co[3]));
@@ -85,8 +91,28 @@ void draw() {
             }
 
     }
-    else{
-        //何もしない
+    else if(unhex(co[0]) == 4369){
+        if (time >= 200){
+            start[i] = new PVector(int(co[1]),int(co[2]),int(co[3]));
+            end[i] = new PVector(int(co[4]),int(co[5]),int(co[6]));
+            i++;
+            ln++;
+            file.println(start[0].x + "," + start[0].y + "," + start[0].z);
+            file.flush();
+            for (int o = 0; o < ln - 1; o++){
+                if (start[o + 1].x == end[o].x && start[o + 1].y == end[o].y && start[o + 1].z == end[o].z){
+                    file.println(start[o + 1].x + "," + start[o + 1].y + "," + start[o + 1].z);
+                    file.flush();
+                }
+                else {
+                    file.println(end[o].x + "," + end[o].y + "," + end[o].z);
+                    file.println(jump + "," + jump + "," + jump);
+                    file.println(start[o + 1].x + "," + start[o + 1].y + "," + start[o +1].z);
+                }
+            }
+            file.println(end[ln - 1].x + "," + end[ln - 1].y + "," + end[ln - 1].z);
+            file.flush();
+        }
     }
 }
 void mouseDragged(){            //マウスの割り込み
