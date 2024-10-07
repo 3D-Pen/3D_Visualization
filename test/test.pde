@@ -71,7 +71,7 @@ void draw() {
         //何もしない
     }
     lin = lines[ln];        //linに任意の行の文字列を代入
-    String[] co = split(lin, ',');      //コンマで区切ってcoに代入
+    String[] co = split(lin, ',');      //コンマで区切ってcoに代入gggg
     if(unhex(co[0]) == 65535){      //co[0]がFFFFなら
         if (time >= 200) {          //0.2秒ずつ
             if(i >= 1000){          //1000個以上直線を描いたら終了
