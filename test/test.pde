@@ -17,18 +17,21 @@ float s;                //
 PrintWriter file;
 int jump = 9999;
 int head = 0;
-
+int ap = 5;
+int sele = 0;
+int time;
 
 
 
 void setup() {
-    size(800, 600, P3D);        //横800，縦600の3D
+    size(1366, 768, P3D);        //横800，縦600の3D
     stroke(0);                //線の色(白色)
     hint(ENABLE_DEPTH_SORT);    //P3DレンダラとOPENGLレンダラにおいて、プリミティブなzソートを有効にする．(よく分からん)
     lights();                   //デフォルトの環境光
     textSize(54);               //テキストサイズを54
     frameRate(30);              //フレームレートを30
     ln = 0;                     //行数を0にする
+
 
     px = PI/6;          //
     pz = PI/6;          //
@@ -37,16 +40,37 @@ void setup() {
     xc = 0;             //
     yc = 0;             //
     zc = 0;             //
-    s = 1;              //
+    s = 0.7;              //
     file = createWriter("test.csv");
 }
 
 void draw() {
-    lines = loadStrings("pos.txt");     //pod.txtを読み込む
-    background(255);                      //背景を黒にする
+    background(255);                      //背景を白にする
     translate(width/2, height/2,0);     //中心を決定
+    lines = loadStrings("pos.txt");     //pod.txtを読み込む
     textFont(createFont("MS Mincho", 48, true));             //フォントをMS明朝にする．
-    if (key == ENTER || head == 1){
+    if (sele == 2){
+        time = millis() - base_time;
+        camera(0, 10, 500, xc, yc, 0, 0, 0, -1);
+        background(255);
+        hint(DISABLE_DEPTH_TEST);
+        fill(0);
+        textFont(createFont("HG正楷書体-PRO", 110));
+        textSize(54);
+        text("終了まであと",200, 220);
+        text(ap,380, 220);
+        text("秒",430, 220);
+        textAlign(CENTER,CENTER);
+        hint(ENABLE_DEPTH_TEST);  // z軸を有効化
+        if (time >= 1000){
+            base_time = millis();
+            ap--;
+            }
+        if (ap == 0){
+            exit();
+        }
+    }
+    else if (sele == 1){
         if(sin(zz) >= 0){
             camera(500*cos(xx)*sin(zz), 500*sin(xx)*sin(zz), 500*cos(zz), xc, yc, 0, 0, 0, -1);
         }           //カメラの位置
@@ -69,7 +93,7 @@ void draw() {
             line(start[k].x, start[k].y, start[k].z, end[k].x, end[k].y, end[k].z);
         }           //毎フレームごとに線を描く
 
-        int time = millis() - base_time;        //一定時間ごとにtimeを初期化
+        time = millis() - base_time;        //一定時間ごとにtimeを初期化
         if(ln == lines.length){
             return;             //読み込んだ行数が最終行なら最初に戻る
         }
@@ -92,7 +116,7 @@ void draw() {
                 ln++;       //1行増やす
                 base_time = millis();
                 }
-
+            head = 0;
         }
         else if(unhex(co[0]) == 4369){
             if (time >= 200){
@@ -115,14 +139,14 @@ void draw() {
                 }
                 file.println(end[ln - 1].x + "," + end[ln - 1].y + "," + end[ln - 1].z);
                 file.flush();
+                ap = 1;
             }
-        head = 1;
+            head = 0;
         }
+        ap = 5;
     }
-    else if (key == TAB){
-        exit();
-    }
-    else {
+    else if(sele == 0){
+        camera(0,10,500, 0, 0, 0, 0, 0, -1);
         hint(DISABLE_DEPTH_TEST);
         fill(0);
         textFont(createFont("HG正楷書体-PRO", 110));
@@ -169,4 +193,16 @@ void mouseWheel(MouseEvent e){      //ホイールでサイズを変更
     if(mw == -1){
         s *= 1.1;
     }   
+}
+
+void keyPressed(){
+    if (key == ENTER){
+        sele = 1;
+    }
+    else if (key == TAB){
+        sele = 2;
+    }
+    else {
+        sele = 0;
+    }
 }
