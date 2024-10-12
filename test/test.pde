@@ -1,12 +1,11 @@
 int base_time = 0;      //一定時間ごとにmillis()を初期化
-int NUM = 1000;         //描ける直線の総数
+int NUM = 10000;         //描ける直線の総数
 int i = 0;              //直線の数
 PVector[] start = new PVector[NUM];     //直線の始まりの座標
 PVector[] end = new PVector[NUM];       //直線の終わりの座標
 String lin;             //テキストで読み込んだ任意の行の文字列
 int ln;                 //行数
 String lines[];         //テキスト全体を読み込む文字列
-int head = 0;           //直線の始まりを記録する
 
 float xx;               //
 float zz;               //
@@ -15,18 +14,24 @@ float rotX,rotY,protY;  //マウスで座標を記録する値
 float xc, yc, zc;       //
 float pxc, pyc, pzc;    //
 float s;                //
+PrintWriter file;
+int jump = 9999;
+int head = 0;
+int ap = 5;
+int sele = 0;
+int time;
+
 
 
 void setup() {
-    size(800, 600, P3D);        //横800，縦600の3D
-    stroke(255);                //線の色(黒色)
+    size(1366, 768, P3D);        //横800，縦600の3D
+    stroke(0);                //線の色(白色)
     hint(ENABLE_DEPTH_SORT);    //P3DレンダラとOPENGLレンダラにおいて、プリミティブなzソートを有効にする．(よく分からん)
     lights();                   //デフォルトの環境光
-    PFont font = createFont("MS Mincho", 48, true);     //fontにMS明朝を代入
-    textFont(font);             //フォントをMS明朝にする．
     textSize(54);               //テキストサイズを54
     frameRate(30);              //フレームレートを30
     ln = 0;                     //行数を0にする
+
 
     px = PI/6;          //
     pz = PI/6;          //
@@ -35,73 +40,120 @@ void setup() {
     xc = 0;             //
     yc = 0;             //
     zc = 0;             //
-    s = 1;              //
+    s = 0.7;              //
+    file = createWriter("test.csv");
 }
 
 void draw() {
-    lines = loadStrings("pos.txt");     //pod.txtを読み込む
-    background(0);                      //背景を黒にする
+    background(255);                      //背景を白にする
     translate(width/2, height/2,0);     //中心を決定
-    if(sin(zz) >= 0){
-        camera(500*cos(xx)*sin(zz), 500*sin(xx)*sin(zz), 500*cos(zz), xc, yc, 0, 0, 0, -1);
-    }           //カメラの位置
-    else {
-        camera(500*cos(xx)*sin(zz), 500*sin(xx)*sin(zz), 500*cos(zz), xc, yc, 0, 0, 0, 1);
-    }           //カメラの位置
-    
-    rotateX(0);
-    rotateY(0);
-    scale(s);
-    textAlign(CENTER); // x方向をセンタリング，y方向の座標はベースライン
-    text("x軸", 200, 0, 0); // XY平面上に書く
-    text("y軸", 0, 200, 0); // XY平面上に書く 
-    text("z軸", 0, 0, 200); // Z=200のXY平面上に書く
-    line(0, 0, 0, 160, 0, 0); // X軸
-    line(0, 0, 0, 0, 160, 0); // Y軸
-    line(0, 0, 0, 0, 0, 160); // Z軸
-
-    for (int k = 0; k < i; k++){
-        line(start[k].x, start[k].y, start[k].z, end[k].x, end[k].y, end[k].z);
-    }           //毎フレームごとに線を描く
-
-    int time = millis() - base_time;        //一定時間ごとにtimeを初期化
-    if(ln == lines.length){
-        return;             //読み込んだ行数が最終行なら最初に戻る
-    }
-    else{
-        //何もしない
-    }
-    lin = lines[ln];        //linに任意の行の文字列を代入
-    String[] co = split(lin, ',');      //コンマで区切ってcoに代入
-    if(unhex(co[0]) == 65535){      //co[0]がFFFFなら
-        if (time >= 200) {          //0.2秒ずつ
-            if(i >= 1000){          //1000個以上直線を描いたら終了
-                exit();
-            }
-            if(head == 0){      //始まりの座標
-                start[i] = new PVector(int(co[1]),int(co[2]),int(co[3]));
-                head = 1;
-            }
-            else{
-                end[i] = new PVector(int(co[1]),int(co[2]),int(co[3]));
-                start[i + 1] = end[i];
-                i++;
-            }
-            ln++;       //1行増やす
+    lines = loadStrings("pos.txt");     //pod.txtを読み込む
+    textFont(createFont("MS Mincho", 48, true));             //フォントをMS明朝にする．
+    if (sele == 2){
+        time = millis() - base_time;
+        camera(0, 10, 500, xc, yc, 0, 0, 0, -1);
+        background(255);
+        hint(DISABLE_DEPTH_TEST);
+        fill(0);
+        textFont(createFont("HG正楷書体-PRO", 110));
+        textSize(54);
+        text("終了まであと",200, 220);
+        text(ap,380, 220);
+        text("秒",430, 220);
+        textAlign(CENTER,CENTER);
+        hint(ENABLE_DEPTH_TEST);  // z軸を有効化
+        if (time >= 1000){
             base_time = millis();
+            ap--;
+            }
+        if (ap == 0){
+            exit();
         }
     }
-    else if(unhex(co[0]) == 4369){      //co[0]が1111なら
-        if(time >= 200){
-            end[i] = new PVector(int(co[1]),int(co[2]),int(co[3]));     //最後の座標
-        i++;
-        ln++;
-        head = 0;
-        base_time = millis();
+    else if (sele == 1){
+        if(sin(zz) >= 0){
+            camera(500*cos(xx)*sin(zz), 500*sin(xx)*sin(zz), 500*cos(zz), xc, yc, 0, 0, 0, -1);
+        }           //カメラの位置
+        else {
+            camera(500*cos(xx)*sin(zz), 500*sin(xx)*sin(zz), 500*cos(zz), xc, yc, 0, 0, 0, 1);
+        }           //カメラの位置
+        
+        rotateX(0);
+        rotateY(0);
+        scale(s);
+        textAlign(CENTER); // x方向をセンタリング，y方向の座標はベースライン
+        text("x軸", 200, 0, 0); // XY平面上に書く
+        text("y軸", 0, 200, 0); // XY平面上に書く 
+        text("z軸", 0, 0, 200); // Z=200のXY平面上に書く
+        line(0, 0, 0, 160, 0, 0); // X軸
+        line(0, 0, 0, 0, 160, 0); // Y軸
+        line(0, 0, 0, 0, 0, 160); // Z軸
+
+        for (int k = 0; k < i; k++){
+            line(start[k].x, start[k].y, start[k].z, end[k].x, end[k].y, end[k].z);
+        }           //毎フレームごとに線を描く
+
+        time = millis() - base_time;        //一定時間ごとにtimeを初期化
+        if(ln == lines.length){
+            return;             //読み込んだ行数が最終行なら最初に戻る
         }
+        else{
+            //何もしない
+        }
+        lin = lines[ln];        //linに任意の行の文字列を代入
+        String[] co = split(lin, ',');      //コンマで区切ってcoに代入
+        if(unhex(co[0]) == 43690){
+            return;
+        }
+        if(unhex(co[0]) == 65535){      //co[0]がFFFFなら
+            if (time >= 200) {          //0.2秒ずつ
+                if(i >= 10000){          //10000個以上直線を描いたら終了
+                    exit();
+                }
+                start[i] = new PVector(int(co[1]),int(co[2]),int(co[3]));
+                end[i] = new PVector(int(co[4]),int(co[5]),int(co[6]));
+                i++;
+                ln++;       //1行増やす
+                base_time = millis();
+                }
+            head = 0;
+        }
+        else if(unhex(co[0]) == 4369){
+            if (time >= 200){
+                start[i] = new PVector(int(co[1]),int(co[2]),int(co[3]));
+                end[i] = new PVector(int(co[4]),int(co[5]),int(co[6]));
+                i++;
+                ln++;
+                file.println(start[0].x + "," + start[0].y + "," + start[0].z);
+                file.flush();
+                for (int o = 0; o < ln - 1; o++){
+                    if (start[o + 1].x == end[o].x && start[o + 1].y == end[o].y && start[o + 1].z == end[o].z){
+                        file.println(start[o + 1].x + "," + start[o + 1].y + "," + start[o + 1].z);
+                        file.flush();
+                    }
+                    else {
+                        file.println(end[o].x + "," + end[o].y + "," + end[o].z);
+                        file.println(jump + "," + jump + "," + jump);
+                        file.println(start[o + 1].x + "," + start[o + 1].y + "," + start[o +1].z);
+                    }
+                }
+                file.println(end[ln - 1].x + "," + end[ln - 1].y + "," + end[ln - 1].z);
+                file.flush();
+                ap = 1;
+            }
+            head = 0;
+        }
+        ap = 5;
     }
-    else{
-        //何もしない
+    else if(sele == 0){
+        camera(0,10,500, 0, 0, 0, 0, 0, -1);
+        hint(DISABLE_DEPTH_TEST);
+        fill(0);
+        textFont(createFont("HG正楷書体-PRO", 110));
+        textSize(54);
+        text("ENTERキーを押して",0, 0);
+        textAlign(CENTER,CENTER);
+        hint(ENABLE_DEPTH_TEST);  // z軸を有効化
     }
 }
 void mouseDragged(){            //マウスの割り込み
@@ -141,4 +193,16 @@ void mouseWheel(MouseEvent e){      //ホイールでサイズを変更
     if(mw == -1){
         s *= 1.1;
     }   
+}
+
+void keyPressed(){
+    if (key == ENTER){
+        sele = 1;
+    }
+    else if (key == TAB){
+        sele = 2;
+    }
+    else {
+        sele = 0;
+    }
 }
