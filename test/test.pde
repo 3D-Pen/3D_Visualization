@@ -15,7 +15,7 @@ float xc, yc, zc;       //
 float pxc, pyc, pzc;    //
 float s;                //
 PrintWriter file;
-int jump = 9999;
+int jump = 9999;        //csvファイルの外れ値
 int head = 0;
 int ap = 5;
 int sele = 0;
