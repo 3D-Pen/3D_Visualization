@@ -1,3 +1,8 @@
+import processing.net.*;
+int port = 10001;
+Server server;
+
+
 int base_time = 0;      //一定時間ごとにmillis()を初期化
 int NUM = 10000;         //描ける直線の総数
 int i = 0;              //直線の数
@@ -6,7 +11,6 @@ PVector[] end = new PVector[NUM];       //直線の終わりの座標
 String lin;             //テキストで読み込んだ任意の行の文字列
 int ln;                 //行数
 String lines[];         //テキスト全体を読み込む文字列
-
 float xx;               //
 float zz;               //
 float px, pz;           //
@@ -20,17 +24,21 @@ int head = 0;
 int ap = 5;
 int sele = 0;
 int time;
+String whatClientSaid;
 
 
 
 void setup() {
-    size(1366, 768, P3D);        //横800，縦600の3D
+    size(1366, 768, P3D);        //横1366，縦768の3D
+    //size(800, 600, P3D);        //横800，縦600の3D
     stroke(0);                //線の色(白色)
     hint(ENABLE_DEPTH_SORT);    //P3DレンダラとOPENGLレンダラにおいて、プリミティブなzソートを有効にする．(よく分からん)
     lights();                   //デフォルトの環境光
     textSize(54);               //テキストサイズを54
     frameRate(30);              //フレームレートを30
     ln = 0;                     //行数を0にする
+    server = new Server(this, port);
+    println("server address: " + server.ip());
 
 
     px = PI/6;          //
@@ -94,34 +102,34 @@ void draw() {
         }           //毎フレームごとに線を描く
 
         time = millis() - base_time;        //一定時間ごとにtimeを初期化
-        if(ln == lines.length){
+        Client client = server.available();
+        if(client ==null){
             return;             //読み込んだ行数が最終行なら最初に戻る
         }
         else{
             //何もしない
         }
-        lin = lines[ln];        //linに任意の行の文字列を代入
-        String[] co = split(lin, ',');      //コンマで区切ってcoに代入
-        if(unhex(co[0]) == 43690){
+        whatClientSaid = client.readString();
+        String[] so = split(whatClientSaid, ',');
+        if(unhex(so[0]) == 43690){
             return;
         }
-        if(unhex(co[0]) == 65535){      //co[0]がFFFFなら
-            if (time >= 200) {          //0.2秒ずつ
+        if(unhex(so[0]) == 65535){      //so[0]がFFFFなら
                 if(i >= 10000){          //10000個以上直線を描いたら終了
                     exit();
                 }
-                start[i] = new PVector(int(co[1]),int(co[2]),int(co[3]));
-                end[i] = new PVector(int(co[4]),int(co[5]),int(co[6]));
+                start[i] = new PVector(int(so[1]),int(so[2]),int(so[3]));
+                end[i] = new PVector(int(so[4]),int(so[5]),int(so[6]));
                 i++;
                 ln++;       //1行増やす
                 base_time = millis();
-                }
-            head = 0;
+            
+            //head = 0;
         }
-        else if(unhex(co[0]) == 4369){
-            if (time >= 200){
-                start[i] = new PVector(int(co[1]),int(co[2]),int(co[3]));
-                end[i] = new PVector(int(co[4]),int(co[5]),int(co[6]));
+        else if(unhex(so[0]) == 4369){
+            
+                start[i] = new PVector(int(so[1]),int(so[2]),int(so[3]));
+                end[i] = new PVector(int(so[4]),int(so[5]),int(so[6]));
                 i++;
                 ln++;
                 file.println(start[0].x + "," + start[0].y + "," + start[0].z);
@@ -141,8 +149,8 @@ void draw() {
                 file.flush();
                 file.close();
                 sele = 2;
-            }
-            head = 0;
+            
+            //head = 0;
         }
         ap = 5;
     }

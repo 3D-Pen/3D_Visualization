@@ -4,6 +4,8 @@ import processing.data.*;
 import processing.event.*;
 import processing.opengl.*;
 
+import processing.net.*;
+
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.io.File;
@@ -15,6 +17,11 @@ import java.io.IOException;
 
 public class test extends PApplet {
 
+
+int port = 10001;
+Server server;
+
+
 int base_time = 0;      //一定時間ごとにmillis()を初期化
 int NUM = 10000;         //描ける直線の総数
 int i = 0;              //直線の数
@@ -23,7 +30,6 @@ PVector[] end = new PVector[NUM];       //直線の終わりの座標
 String lin;             //テキストで読み込んだ任意の行の文字列
 int ln;                 //行数
 String lines[];         //テキスト全体を読み込む文字列
-
 float xx;               //
 float zz;               //
 float px, pz;           //
@@ -37,10 +43,12 @@ int head = 0;
 int ap = 5;
 int sele = 0;
 int time;
+String whatClientSaid;
 
 
 
 public void setup() {
+    //size(1366, 768, P3D);        //横800，縦600の3D
     /* size commented out by preprocessor */;        //横800，縦600の3D
     stroke(0);                //線の色(白色)
     hint(ENABLE_DEPTH_SORT);    //P3DレンダラとOPENGLレンダラにおいて、プリミティブなzソートを有効にする．(よく分からん)
@@ -48,6 +56,8 @@ public void setup() {
     textSize(54);               //テキストサイズを54
     frameRate(30);              //フレームレートを30
     ln = 0;                     //行数を0にする
+    server = new Server(this, port);
+    println("server address: " + server.ip());
 
 
     px = PI/6;          //
@@ -111,34 +121,35 @@ public void draw() {
         }           //毎フレームごとに線を描く
 
         time = millis() - base_time;        //一定時間ごとにtimeを初期化
-        if(ln == lines.length){
+        Client client = server.available();
+        if(client ==null){
             return;             //読み込んだ行数が最終行なら最初に戻る
         }
         else{
             //何もしない
         }
-        lin = lines[ln];        //linに任意の行の文字列を代入
-        String[] co = split(lin, ',');      //コンマで区切ってcoに代入
-        if(unhex(co[0]) == 43690){
+        whatClientSaid = client.readString();
+        String[] so = split(whatClientSaid, ',');
+        if(unhex(so[0]) == 43690){
             return;
         }
-        if(unhex(co[0]) == 65535){      //co[0]がFFFFなら
-            if (time >= 200) {          //0.2秒ずつ
+        if(unhex(so[0]) == 65535){      //co[0]がFFFFなら
+            
                 if(i >= 10000){          //10000個以上直線を描いたら終了
                     exit();
                 }
-                start[i] = new PVector(PApplet.parseInt(co[1]),PApplet.parseInt(co[2]),PApplet.parseInt(co[3]));
-                end[i] = new PVector(PApplet.parseInt(co[4]),PApplet.parseInt(co[5]),PApplet.parseInt(co[6]));
+                start[i] = new PVector(PApplet.parseInt(so[1]),PApplet.parseInt(so[2]),PApplet.parseInt(so[3]));
+                end[i] = new PVector(PApplet.parseInt(so[4]),PApplet.parseInt(so[5]),PApplet.parseInt(so[6]));
                 i++;
                 ln++;       //1行増やす
                 base_time = millis();
-                }
-            head = 0;
+            
+            //head = 0;
         }
-        else if(unhex(co[0]) == 4369){
-            if (time >= 200){
-                start[i] = new PVector(PApplet.parseInt(co[1]),PApplet.parseInt(co[2]),PApplet.parseInt(co[3]));
-                end[i] = new PVector(PApplet.parseInt(co[4]),PApplet.parseInt(co[5]),PApplet.parseInt(co[6]));
+        else if(unhex(so[0]) == 4369){
+            
+                start[i] = new PVector(PApplet.parseInt(so[1]),PApplet.parseInt(so[2]),PApplet.parseInt(so[3]));
+                end[i] = new PVector(PApplet.parseInt(so[4]),PApplet.parseInt(so[5]),PApplet.parseInt(so[6]));
                 i++;
                 ln++;
                 file.println(start[0].x + "," + start[0].y + "," + start[0].z);
@@ -158,8 +169,8 @@ public void draw() {
                 file.flush();
                 file.close();
                 sele = 2;
-            }
-            head = 0;
+            
+            //head = 0;
         }
         ap = 5;
     }
@@ -226,7 +237,7 @@ public void keyPressed(){
 }
 
 
-  public void settings() { size(1366, 768, P3D); }
+  public void settings() { size(800, 600, P3D); }
 
   static public void main(String[] passedArgs) {
     String[] appletArgs = new String[] { "test" };
