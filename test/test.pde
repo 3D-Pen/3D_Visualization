@@ -139,7 +139,8 @@ void draw() {
                 }
                 file.println(end[ln - 1].x + "," + end[ln - 1].y + "," + end[ln - 1].z);
                 file.flush();
-                ap = 1;
+                file.close();
+                sele = 2;
             }
             head = 0;
         }
