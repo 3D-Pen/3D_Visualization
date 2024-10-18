@@ -21,7 +21,6 @@ public class test extends PApplet {
 int port = 10001;
 Server server;
 
-
 int base_time = 0;      //一定時間ごとにmillis()を初期化
 int NUM = 10000;         //描ける直線の総数
 int i;               //直線の数
@@ -39,7 +38,7 @@ float pxc, pyc, pzc;    //
 float s;                //
 PrintWriter file;
 int jump = 9999;        //csvファイルの外れ値
-int head = 0;
+//int head = 0;
 int ap = 5;
 int sele = 0;
 int time;
@@ -66,7 +65,10 @@ public void draw() {
     translate(width/2, height/2,0);     //中心を決定
     //lines = loadStrings("pos.txt");     //pod.txtを読み込む
     textFont(createFont("MS Mincho", 48, true));             //フォントをMS明朝にする．
-    if (sele == 2){
+    if (sele == 3){
+        exit();
+    }
+    else if (sele == 2){
         time = millis() - base_time;
         endscreen();
         if (time >= 1000){
@@ -192,6 +194,9 @@ public void keyPressed(){
     else if (key == TAB){
         sele = 2;
     }
+    else if (key == ESC){
+        sele = 3;
+    }
     else {
         sele = 0;
     }
@@ -199,7 +204,7 @@ public void keyPressed(){
 
 public void formatting(){
     i = 0;
-    ln = 0;                     //行数を0にする
+    ln = 0;             //行数を0にする
     px = PI/6;          //
     pz = PI/6;          //
     xx = PI/6;          //
@@ -222,6 +227,7 @@ public void makecsvfile(){
             file.println(end[o].x + "," + end[o].y + "," + end[o].z);
             file.println(jump + "," + jump + "," + jump);
             file.println(start[o + 1].x + "," + start[o + 1].y + "," + start[o +1].z);
+            file.flush();
         }
     }
     file.println(end[ln - 1].x + "," + end[ln - 1].y + "," + end[ln - 1].z);
