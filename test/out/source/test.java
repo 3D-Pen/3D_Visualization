@@ -38,11 +38,12 @@ float pxc, pyc, pzc;    //
 float s;                //
 PrintWriter file;
 int jump = 9999;        //csvファイルの外れ値
-//int head = 0;
+int head = 0;
 int ap = 5;
 int sele = 0;
 int time;
 String whatClientSaid;
+int count;
 
 
 
@@ -57,7 +58,8 @@ public void setup() {
     server = new Server(this, port);
     println("server address: " + server.ip());
     formatting();
-    file = createWriter("test.csv");
+    //file = createWriter("test.csv");
+    count = 0;
 }
 
 public void draw() {
@@ -118,28 +120,41 @@ public void draw() {
         whatClientSaid = client.readString();
         String[] so = split(whatClientSaid, ',');
         //println(so[0] + "," + so[1] + "," + so[2] + "," + so[3] + "," + so[4] + "," + so[5] + "," + so[6]);
-        if(unhex(so[0]) == 43690){
+        if(unhex(so[0]) == 43690) {
+            start[i] = new PVector(0,0,0);
+            head = 0;
             return;
         }
         if(unhex(so[0]) == 65535){      //so[0]がFFFFなら
                 if(i >= 10000){          //10000個以上直線を描いたら終了
                     exit();
                 }
-                start[i] = new PVector(PApplet.parseInt(so[1]),PApplet.parseInt(so[2]),PApplet.parseInt(so[3]));
-                end[i] = new PVector(PApplet.parseInt(so[4]),PApplet.parseInt(so[5]),PApplet.parseInt(so[6]));
-                i++;
-                ln++;       //1行増やす
+                else {
+                    //何もしない
+                }
+                if(head == 0){
+                    start[i] = new PVector(PApplet.parseInt(so[1]),PApplet.parseInt(so[2]),PApplet.parseInt(so[3]));
+                    head = 1;
+                }
+                else {
+                    end[i] = new PVector(PApplet.parseInt(so[1]),PApplet.parseInt(so[2]),PApplet.parseInt(so[3]));
+                    start[i + 1] = end[i];
+                    i++;
+                    ln++;       //1行増やす
+                }
+                
                 base_time = millis();
             
             //head = 0;
         }
         else if(unhex(so[0]) == 4369){
-            start[i] = new PVector(PApplet.parseInt(so[1]),PApplet.parseInt(so[2]),PApplet.parseInt(so[3]));
-            end[i] = new PVector(PApplet.parseInt(so[4]),PApplet.parseInt(so[5]),PApplet.parseInt(so[6]));
+            end[i] = new PVector(PApplet.parseInt(so[1]),PApplet.parseInt(so[2]),PApplet.parseInt(so[3]));
             i++;
-            ln++;  
+            ln++;
+            file = createWriter("test_" + count + ".csv");
             makecsvfile();
             sele = 2;
+            count++;
             //head = 0;
         }
         ap = 5;
@@ -203,6 +218,7 @@ public void keyPressed(){
 }
 
 public void formatting(){
+    head = 0;
     i = 0;
     ln = 0;             //行数を0にする
     px = PI/6;          //
