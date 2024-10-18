@@ -1,72 +1,66 @@
-int base_time = 0;      //一定時間ごとにmillis()を初期化
-int NUM = 10000;         //描ける直線の総数
-int i = 0;              //直線の数
+import processing.net.*;    //processingソケット通信
+int port = 10001;           //適当なポート番号(受信、送信で一致させる)
+Server server;              //Server型
+
+int base_time = 0;          //一定時間ごとにmillis()を初期化
+int NUM = 10000;            //描ける直線の総数
+int i;                      //直線の数
 PVector[] start = new PVector[NUM];     //直線の始まりの座標
 PVector[] end = new PVector[NUM];       //直線の終わりの座標
-String lin;             //テキストで読み込んだ任意の行の文字列
-int ln;                 //行数
-String lines[];         //テキスト全体を読み込む文字列
-float xx;               //
-float zz;               //
-float px, pz;           //
-float rotX,rotY,protY;  //マウスで座標を記録する値
-float xc, yc, zc;       //
-float pxc, pyc, pzc;    //
-float s;                //
-PrintWriter file;
-int jump = 9999;        //csvファイルの外れ値
-int head = 0;
-int ap = 5;
-int sele = 0;
-int time;
+int ln;                     //受信した行数
+float xx;                   //{
+float zz;                   //
+float px, pz;               //
+float rotX,rotY,protY;      //マウスで座標を記録する値
+float xc, yc, zc;           //
+float pxc, pyc, pzc;        //}
+float s;                    //拡大サイズ
+PrintWriter file;           //書き込む型
+int jump = 9999;            //csvファイルの外れ値
+int head = 0;               //受信が1回目のとき
+int ap = 5;                 //5秒待つ
+int sele = 0;               
+int time;                   //時間
+String whatClientSaid;      //受信する型
+int count;                  //これまで繰り返した数
 
 
 
 void setup() {
-    size(1366, 768, P3D);        //横800，縦600の3D
-    stroke(0);                //線の色(白色)
-    hint(ENABLE_DEPTH_SORT);    //P3DレンダラとOPENGLレンダラにおいて、プリミティブなzソートを有効にする．(よく分からん)
-    lights();                   //デフォルトの環境光
-    textSize(54);               //テキストサイズを54
-    frameRate(30);              //フレームレートを30
-    ln = 0;                     //行数を0にする
-
-
-    px = PI/6;          //
-    pz = PI/6;          //
-    xx = PI/6;          //
-    zz = PI/6;          //カメラの初期環境
-    xc = 0;             //
-    yc = 0;             //
-    zc = 0;             //
-    s = 0.7;              //
-    file = createWriter("test.csv");
+    size(1366, 768, P3D);           //横1366，縦768の3D
+    //size(800, 600, P3D);          //横800，縦600の3D
+    stroke(0);                      //線の色(白色)
+    hint(ENABLE_DEPTH_SORT);        //P3DレンダラとOPENGLレンダラにおいて、プリミティブなzソートを有効にする．(よく分からん)
+    lights();                       //デフォルトの環境光
+    textSize(54);                   //テキストサイズを54
+    frameRate(30);                  //フレームレートを30
+    server = new Server(this, port);
+    println("server address: " + server.ip());      //このパソコンのIPアドレスを表示
+    formatting();                   //いろいろな数値を初期化
+    count = 0;
 }
 
 void draw() {
-    background(255);                      //背景を白にする
-    translate(width/2, height/2,0);     //中心を決定
-    lines = loadStrings("pos.txt");     //pod.txtを読み込む
+    background(255);                        //背景を白にする
+    translate(width/2, height/2,0);         //中心を決定
     textFont(createFont("MS Mincho", 48, true));             //フォントをMS明朝にする．
-    if (sele == 2){
-        time = millis() - base_time;
-        camera(0, 10, 500, xc, yc, 0, 0, 0, -1);
-        background(255);
-        hint(DISABLE_DEPTH_TEST);
-        fill(0);
-        textFont(createFont("HG正楷書体-PRO", 110));
-        textSize(54);
-        text("終了まであと",200, 220);
-        text(ap,380, 220);
-        text("秒",430, 220);
-        textAlign(CENTER,CENTER);
-        hint(ENABLE_DEPTH_TEST);  // z軸を有効化
-        if (time >= 1000){
+    if (sele == 3){
+        exit();         //強制終了
+    }
+    else if (sele == 2){
+        time = millis() - base_time;        //時間を初期化
+        endscreen();
+        if (time >= 1000){      //1秒待つ
             base_time = millis();
             ap--;
             }
         if (ap == 0){
-            exit();
+            sele = 0;       //初期画面に戻す
+            for (int k = 0; k < i; k++){
+                start[k] = new PVector(0,0,0);      //配列を初期化
+                end[k] = new PVector(0,0,0);        //同上
+            }
+            formatting();
         }
     }
     else if (sele == 1){
@@ -93,66 +87,52 @@ void draw() {
         }           //毎フレームごとに線を描く
 
         time = millis() - base_time;        //一定時間ごとにtimeを初期化
-        if(ln == lines.length){
-            return;             //読み込んだ行数が最終行なら最初に戻る
+        Client client = server.available(); //clientに受信した信号を受け取る
+        if(client ==null){                  //何も信号が来なかったら
+            return;             //最初に戻る
         }
         else{
             //何もしない
         }
-        lin = lines[ln];        //linに任意の行の文字列を代入
-        String[] co = split(lin, ',');      //コンマで区切ってcoに代入
-        if(unhex(co[0]) == 43690){
+        whatClientSaid = client.readString();       //受信した文字列を収容
+        String[] so = split(whatClientSaid, ',');   //コンマで区切られた文字列を分ける
+        if(unhex(so[0]) == 43690) {                 //AAAAならば
+            start[i] = new PVector(0,0,0);
+            head = 0;
             return;
         }
-        if(unhex(co[0]) == 65535){      //co[0]がFFFFなら
-            if (time >= 200) {          //0.2秒ずつ
+        if(unhex(so[0]) == 65535){       //so[0]がFFFFなら
                 if(i >= 10000){          //10000個以上直線を描いたら終了
                     exit();
                 }
-                start[i] = new PVector(int(co[1]),int(co[2]),int(co[3]));
-                end[i] = new PVector(int(co[4]),int(co[5]),int(co[6]));
-                i++;
-                ln++;       //1行増やす
+                else {
+                    //何もしない
+                }
+                if(head == 0){          //1回目かAAAAの次
+                    start[i] = new PVector(int(so[1]),int(so[2]),int(so[3]));
+                    head = 1;
+                }
+                else {
+                    end[i] = new PVector(int(so[1]),int(so[2]),int(so[3]));
+                    start[i + 1] = end[i];  //終端と先端を一致させる
+                    i++;
+                    ln++;       //1行増やす
+                }
                 base_time = millis();
-                }
-            head = 0;
         }
-        else if(unhex(co[0]) == 4369){
-            if (time >= 200){
-                start[i] = new PVector(int(co[1]),int(co[2]),int(co[3]));
-                end[i] = new PVector(int(co[4]),int(co[5]),int(co[6]));
-                i++;
-                ln++;
-                file.println(start[0].x + "," + start[0].y + "," + start[0].z);
-                file.flush();
-                for (int o = 0; o < ln - 1; o++){
-                    if (start[o + 1].x == end[o].x && start[o + 1].y == end[o].y && start[o + 1].z == end[o].z){
-                        file.println(start[o + 1].x + "," + start[o + 1].y + "," + start[o + 1].z);
-                        file.flush();
-                    }
-                    else {
-                        file.println(end[o].x + "," + end[o].y + "," + end[o].z);
-                        file.println(jump + "," + jump + "," + jump);
-                        file.println(start[o + 1].x + "," + start[o + 1].y + "," + start[o +1].z);
-                    }
-                }
-                file.println(end[ln - 1].x + "," + end[ln - 1].y + "," + end[ln - 1].z);
-                file.flush();
-                ap = 1;
-            }
-            head = 0;
+        else if(unhex(so[0]) == 4369){   //1111ならば
+            end[i] = new PVector(int(so[1]),int(so[2]),int(so[3]));
+            i++;
+            ln++;
+            file = createWriter("test_" + count + ".csv");  //csvファイルを順次作成
+            makecsvfile();
+            sele = 2;
+            count++;
         }
         ap = 5;
     }
     else if(sele == 0){
-        camera(0,10,500, 0, 0, 0, 0, 0, -1);
-        hint(DISABLE_DEPTH_TEST);
-        fill(0);
-        textFont(createFont("HG正楷書体-PRO", 110));
-        textSize(54);
-        text("ENTERキーを押して",0, 0);
-        textAlign(CENTER,CENTER);
-        hint(ENABLE_DEPTH_TEST);  // z軸を有効化
+        startscreen();
     }
 }
 void mouseDragged(){            //マウスの割り込み
@@ -194,14 +174,76 @@ void mouseWheel(MouseEvent e){      //ホイールでサイズを変更
     }   
 }
 
-void keyPressed(){
+void keyPressed(){          //キーを押したら
     if (key == ENTER){
         sele = 1;
     }
     else if (key == TAB){
         sele = 2;
     }
+    else if (key == ESC){
+        sele = 3;
+    }
     else {
         sele = 0;
     }
+}
+
+void formatting(){          //初期化
+    head = 0;
+    i = 0;
+    ln = 0;             //行数を0にする
+    px = PI/6;          //
+    pz = PI/6;          //
+    xx = PI/6;          //
+    zz = PI/6;          //カメラの初期環境
+    xc = 0;             //
+    yc = 0;             //
+    zc = 0;             //
+    s = 0.7;            //
+}
+
+void makecsvfile(){         //csvファイルの作成
+    file.println(start[0].x + "," + start[0].y + "," + start[0].z);
+    file.flush();
+    for (int o = 0; o < ln - 1; o++){
+        if (start[o + 1].x == end[o].x && start[o + 1].y == end[o].y && start[o + 1].z == end[o].z){//終端と先端が一致するなら
+            file.println(start[o + 1].x + "," + start[o + 1].y + "," + start[o + 1].z);
+            file.flush();
+        }
+        else {
+            file.println(end[o].x + "," + end[o].y + "," + end[o].z);
+            file.println(jump + "," + jump + "," + jump);       //外れ値を出力
+            file.println(start[o + 1].x + "," + start[o + 1].y + "," + start[o +1].z);
+            file.flush();
+        }
+    }
+    file.println(end[ln - 1].x + "," + end[ln - 1].y + "," + end[ln - 1].z);
+    file.flush();
+    file.close();
+}
+
+void startscreen(){         //初期画面
+    camera(0,10,500, 0, 0, 0, 0, 0, -1);
+    hint(DISABLE_DEPTH_TEST);
+    fill(0);
+    textFont(createFont("HG正楷書体-PRO", 110));
+    textSize(54);
+    text("ENTERキーを押して",0, 0);
+    textAlign(CENTER,CENTER);
+    hint(ENABLE_DEPTH_TEST);  // z軸を有効化
+}
+
+void endscreen(){           //終了画面
+    camera(0, 10, 500, xc, yc, 0, 0, 0, -1);
+    background(255);
+    hint(DISABLE_DEPTH_TEST);
+    fill(0);
+    textFont(createFont("HG正楷書体-PRO", 110));
+    textSize(54);
+    text("終了まであと",200, 220);
+    text(ap,380, 220);
+    text("秒",430, 220);
+    textAlign(CENTER,CENTER);
+    hint(ENABLE_DEPTH_TEST);  // z軸を有効化
 }
