@@ -1,12 +1,15 @@
+import processing.net.*;
+int port = 10001;
+Server server;
+
 int base_time = 0;      //一定時間ごとにmillis()を初期化
 int NUM = 10000;         //描ける直線の総数
-int i = 0;              //直線の数
+int i;               //直線の数
 PVector[] start = new PVector[NUM];     //直線の始まりの座標
 PVector[] end = new PVector[NUM];       //直線の終わりの座標
-String lin;             //テキストで読み込んだ任意の行の文字列
+//String lin;             //テキストで読み込んだ任意の行の文字列
 int ln;                 //行数
-String lines[];         //テキスト全体を読み込む文字列
-
+//String lines[];         //テキスト全体を読み込む文字列
 float xx;               //
 float zz;               //
 float px, pz;           //
@@ -20,54 +23,48 @@ int head = 0;
 int ap = 5;
 int sele = 0;
 int time;
+String whatClientSaid;
+int count;
 
 
 
 void setup() {
-    size(1366, 768, P3D);        //横800，縦600の3D
+    size(1366, 768, P3D);        //横1366，縦768の3D
+    //size(800, 600, P3D);        //横800，縦600の3D
     stroke(0);                //線の色(白色)
     hint(ENABLE_DEPTH_SORT);    //P3DレンダラとOPENGLレンダラにおいて、プリミティブなzソートを有効にする．(よく分からん)
     lights();                   //デフォルトの環境光
     textSize(54);               //テキストサイズを54
     frameRate(30);              //フレームレートを30
-    ln = 0;                     //行数を0にする
-
-
-    px = PI/6;          //
-    pz = PI/6;          //
-    xx = PI/6;          //
-    zz = PI/6;          //カメラの初期環境
-    xc = 0;             //
-    yc = 0;             //
-    zc = 0;             //
-    s = 0.7;              //
-    file = createWriter("test.csv");
+    server = new Server(this, port);
+    println("server address: " + server.ip());
+    formatting();
+    //file = createWriter("test.csv");
+    count = 0;
 }
 
 void draw() {
     background(255);                      //背景を白にする
     translate(width/2, height/2,0);     //中心を決定
-    lines = loadStrings("pos.txt");     //pod.txtを読み込む
+    //lines = loadStrings("pos.txt");     //pod.txtを読み込む
     textFont(createFont("MS Mincho", 48, true));             //フォントをMS明朝にする．
-    if (sele == 2){
+    if (sele == 3){
+        exit();
+    }
+    else if (sele == 2){
         time = millis() - base_time;
-        camera(0, 10, 500, xc, yc, 0, 0, 0, -1);
-        background(255);
-        hint(DISABLE_DEPTH_TEST);
-        fill(0);
-        textFont(createFont("HG正楷書体-PRO", 110));
-        textSize(54);
-        text("終了まであと",200, 220);
-        text(ap,380, 220);
-        text("秒",430, 220);
-        textAlign(CENTER,CENTER);
-        hint(ENABLE_DEPTH_TEST);  // z軸を有効化
+        endscreen();
         if (time >= 1000){
             base_time = millis();
             ap--;
             }
         if (ap == 0){
-            exit();
+            sele = 0;
+            for (int k = 0; k < i; k++){
+                start[k] = new PVector(0,0,0);
+                end[k] = new PVector(0,0,0);
+            }
+            formatting();
         }
     }
     else if (sele == 1){
@@ -94,67 +91,57 @@ void draw() {
         }           //毎フレームごとに線を描く
 
         time = millis() - base_time;        //一定時間ごとにtimeを初期化
-        if(ln == lines.length){
+        Client client = server.available();
+        if(client ==null){
             return;             //読み込んだ行数が最終行なら最初に戻る
         }
         else{
             //何もしない
         }
-        lin = lines[ln];        //linに任意の行の文字列を代入
-        String[] co = split(lin, ',');      //コンマで区切ってcoに代入
-        if(unhex(co[0]) == 43690){
+        whatClientSaid = client.readString();
+        String[] so = split(whatClientSaid, ',');
+        //println(so[0] + "," + so[1] + "," + so[2] + "," + so[3] + "," + so[4] + "," + so[5] + "," + so[6]);
+        if(unhex(so[0]) == 43690) {
+            start[i] = new PVector(0,0,0);
+            head = 0;
             return;
         }
-        if(unhex(co[0]) == 65535){      //co[0]がFFFFなら
-            if (time >= 200) {          //0.2秒ずつ
+        if(unhex(so[0]) == 65535){      //so[0]がFFFFなら
                 if(i >= 10000){          //10000個以上直線を描いたら終了
                     exit();
                 }
-                start[i] = new PVector(int(co[1]),int(co[2]),int(co[3]));
-                end[i] = new PVector(int(co[4]),int(co[5]),int(co[6]));
-                i++;
-                ln++;       //1行増やす
+                else {
+                    //何もしない
+                }
+                if(head == 0){
+                    start[i] = new PVector(int(so[1]),int(so[2]),int(so[3]));
+                    head = 1;
+                }
+                else {
+                    end[i] = new PVector(int(so[1]),int(so[2]),int(so[3]));
+                    start[i + 1] = end[i];
+                    i++;
+                    ln++;       //1行増やす
+                }
+                
                 base_time = millis();
-                }
-            head = 0;
+            
+            //head = 0;
         }
-        else if(unhex(co[0]) == 4369){
-            if (time >= 200){
-                start[i] = new PVector(int(co[1]),int(co[2]),int(co[3]));
-                end[i] = new PVector(int(co[4]),int(co[5]),int(co[6]));
-                i++;
-                ln++;
-                file.println(start[0].x + "," + start[0].y + "," + start[0].z);
-                file.flush();
-                for (int o = 0; o < ln - 1; o++){
-                    if (start[o + 1].x == end[o].x && start[o + 1].y == end[o].y && start[o + 1].z == end[o].z){
-                        file.println(start[o + 1].x + "," + start[o + 1].y + "," + start[o + 1].z);
-                        file.flush();
-                    }
-                    else {
-                        file.println(end[o].x + "," + end[o].y + "," + end[o].z);
-                        file.println(jump + "," + jump + "," + jump);
-                        file.println(start[o + 1].x + "," + start[o + 1].y + "," + start[o +1].z);
-                    }
-                }
-                file.println(end[ln - 1].x + "," + end[ln - 1].y + "," + end[ln - 1].z);
-                file.flush();
-                file.close();
-                sele = 2;
-            }
-            head = 0;
+        else if(unhex(so[0]) == 4369){
+            end[i] = new PVector(int(so[1]),int(so[2]),int(so[3]));
+            i++;
+            ln++;
+            file = createWriter("test_" + count + ".csv");
+            makecsvfile();
+            sele = 2;
+            count++;
+            //head = 0;
         }
         ap = 5;
     }
     else if(sele == 0){
-        camera(0,10,500, 0, 0, 0, 0, 0, -1);
-        hint(DISABLE_DEPTH_TEST);
-        fill(0);
-        textFont(createFont("HG正楷書体-PRO", 110));
-        textSize(54);
-        text("ENTERキーを押して",0, 0);
-        textAlign(CENTER,CENTER);
-        hint(ENABLE_DEPTH_TEST);  // z軸を有効化
+        startscreen();
     }
 }
 void mouseDragged(){            //マウスの割り込み
@@ -203,7 +190,69 @@ void keyPressed(){
     else if (key == TAB){
         sele = 2;
     }
+    else if (key == ESC){
+        sele = 3;
+    }
     else {
         sele = 0;
     }
+}
+
+void formatting(){
+    head = 0;
+    i = 0;
+    ln = 0;             //行数を0にする
+    px = PI/6;          //
+    pz = PI/6;          //
+    xx = PI/6;          //
+    zz = PI/6;          //カメラの初期環境
+    xc = 0;             //
+    yc = 0;             //
+    zc = 0;             //
+    s = 0.7;            //
+}
+
+void makecsvfile(){
+    file.println(start[0].x + "," + start[0].y + "," + start[0].z);
+    file.flush();
+    for (int o = 0; o < ln - 1; o++){
+        if (start[o + 1].x == end[o].x && start[o + 1].y == end[o].y && start[o + 1].z == end[o].z){
+            file.println(start[o + 1].x + "," + start[o + 1].y + "," + start[o + 1].z);
+            file.flush();
+        }
+        else {
+            file.println(end[o].x + "," + end[o].y + "," + end[o].z);
+            file.println(jump + "," + jump + "," + jump);
+            file.println(start[o + 1].x + "," + start[o + 1].y + "," + start[o +1].z);
+            file.flush();
+        }
+    }
+    file.println(end[ln - 1].x + "," + end[ln - 1].y + "," + end[ln - 1].z);
+    file.flush();
+    file.close();
+}
+
+void startscreen(){
+    camera(0,10,500, 0, 0, 0, 0, 0, -1);
+    hint(DISABLE_DEPTH_TEST);
+    fill(0);
+    textFont(createFont("HG正楷書体-PRO", 110));
+    textSize(54);
+    text("ENTERキーを押して",0, 0);
+    textAlign(CENTER,CENTER);
+    hint(ENABLE_DEPTH_TEST);  // z軸を有効化
+}
+
+void endscreen(){
+    camera(0, 10, 500, xc, yc, 0, 0, 0, -1);
+    background(255);
+    hint(DISABLE_DEPTH_TEST);
+    fill(0);
+    textFont(createFont("HG正楷書体-PRO", 110));
+    textSize(54);
+    text("終了まであと",200, 220);
+    text(ap,380, 220);
+    text("秒",430, 220);
+    textAlign(CENTER,CENTER);
+    hint(ENABLE_DEPTH_TEST);  // z軸を有効化
 }
