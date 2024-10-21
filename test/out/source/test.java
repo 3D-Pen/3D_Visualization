@@ -54,7 +54,7 @@ PrintWriter file;           //書き込む型
 int jump = 9999;            //csvファイルの外れ値
 int head = 0;               //受信が1回目のとき
 int head1 = 0;
-int ap = 5;                 //5秒待つ
+int ap = 2;                 //5秒待つ
 int sele = 0;               
 int time;                   //時間
 int time1;
@@ -97,7 +97,7 @@ public void setup() {
     formatting();                   //いろいろな数値を初期化
     count = 0;
     
-    textFont(createFont("MS Mincho", 48, true));             //フォントをMS明朝にする．
+    textFont(createFont("ＭＳ ゴシック", 48, true));             //フォントをMS明朝にする．
 }
 
 public void draw() {
@@ -111,19 +111,20 @@ public void draw() {
     }
     else if (sele == 5) {
         time = millis() - base_time;        //時間を初期化
-        endscreen();
-        
-        if (time >= 1000) {      //1秒待つ
-            base_time = millis();
-            ap--;
-        }
-        if (ap == 0) {
-            sele = 0;       //初期画面に戻す
-            for (int k = 0; k < i; k++) {
-                start[k] = new PVector(0,0,0);      //配列を初期化
-                end[k] = new PVector(0,0,0);        //同上
+        endscreen1();
+        if (finish_msg == 1){
+            if (time >= 1000) {      //1秒待つ
+                base_time = millis();
+                ap--;
             }
-            formatting();
+            if (ap == 0) {
+                sele = 0;       //初期画面に戻す
+                for (int k = 0; k < i; k++) {
+                    start[k] = new PVector(0,0,0);      //配列を初期化
+                    end[k] = new PVector(0,0,0);        //同上
+                }
+                formatting();
+            }
         }
     }
     else if (sele == 1 || sele == 2) {
@@ -206,10 +207,10 @@ public void draw() {
         ap = 5;
     }
     else if (sele == 0) {
-        startscreen1();
-        //base_time1 = millis();
-        //base_time2 = millis();
-        //sele = 5;
+        //startscreen1();
+        base_time1 = millis();
+        base_time2 = millis();
+        sele = 5;
     }
 }
 public void mouseDragged() {            //マウスの割り込み
@@ -308,7 +309,7 @@ public void formatting() {          //初期化
     load_counter = 4;
     load_meter = 0;
     finish_msg = 0;
-    ap = 5;
+    ap = 2;
     bound0 = 0;
     bound1 = 0;
     bound2 = 0;
@@ -475,7 +476,7 @@ public void endscreen1(){           //終了画面
     textAlign(CENTER,CENTER);
     textSize(54);
     if (finish_msg == 1){
-        text("初期化まであと" + ap + "秒",0, 0);
+        //text("初期化まであと" + ap + "秒",0, 0);
     }
     else {
     //gif();
