@@ -31,6 +31,10 @@ int port = 10001;           //適当なポート番号(受信、送信で一致�
 Server server;              //Server型
 
 int base_time = 0;          //一定時間ごとにmillis()を初期化
+int base_time1 = 0;
+int base_time2 = 0;
+int base_time3 = 0;
+
 int NUM = 10000;            //描ける直線の総数
 int i;                      //直線の数
 PVector[] start = new PVector[NUM];     //直線の始まりの座標
@@ -46,9 +50,14 @@ float s;                    //拡大サイズ
 PrintWriter file;           //書き込む型
 int jump = 9999;            //csvファイルの外れ値
 int head = 0;               //受信が1回目のとき
+int head1 = 0;
 int ap = 5;                 //5秒待つ
 int sele = 0;               
 int time;                   //時間
+int time1;
+int time2;
+int time3;
+int time_sele;
 String whatClientSaid;      //受信する型
 int count;                  //これまで繰り返した数
 float msg_X;
@@ -61,6 +70,16 @@ float pull_X;
 float pull_Y;
 int dragging = 0;
 float strong;
+int load;
+int load_counter;
+int finish_msg;
+int load_meter;
+float bound0;
+float bound1;
+float bound2;
+int bound_sele;
+int finish;
+int final_error_msg;
 
 
 public void setup() {
@@ -83,6 +102,9 @@ public void draw() {
     translate(width / 2, height / 2,0);         //中心を決定
     if (sele == 3) {
         exit();         //強制終了
+    }
+    else if (sele == 4){
+        errorscreen1();
     }
     else if (sele == 5) {
         time = millis() - base_time;        //時間を初期化
@@ -138,6 +160,10 @@ public void draw() {
         time = millis() - base_time;        //一定時間ごとにtimeを初期化
         Client client = server.available(); //clientに受信した信号を受け取る
         if (client ==  null) {                  //何も信号が来なかったら
+            if (finish == 1){
+                base_time3 = millis();
+                sele = 4;
+            }
             return;             //最初に戻る
         }
         else{
@@ -178,6 +204,9 @@ public void draw() {
     }
     else if (sele == 0) {
         startscreen1();
+        //base_time1 = millis();
+        //base_time2 = millis();
+        //sele = 5;
     }
 }
 public void mouseDragged() {            //マウスの割り込み
@@ -239,6 +268,9 @@ public void keyPressed() {          //キーを押したら
         sele = 1;
     }
     else if (key == TAB) {
+        base_time1 = millis();
+        base_time2 = millis();
+        finish = 1;
         sele = 2;
     }
     else if (key == ESC) {
@@ -251,6 +283,7 @@ public void keyPressed() {          //キーを押したら
 
 public void formatting() {          //初期化
     head = 0;
+    head1 = 0;
     i = 0;
     ln = 0;             //行数を0にする
     px = PI / 6;          //
@@ -267,6 +300,18 @@ public void formatting() {          //初期化
     msg_Y = 0;
     clickX = 0;
     clickY = 0;
+    time_sele = 50;
+    load = 0;
+    load_counter = 4;
+    load_meter = 0;
+    finish_msg = 0;
+    ap = 5;
+    bound0 = 0;
+    bound1 = 0;
+    bound2 = 0;
+    bound_sele = 0;
+    finish = 0;
+    strokeWeight(1);
 }
 
 public void makecsvfile() {         //csvファイルの作成
@@ -349,6 +394,177 @@ public void endscreen() {           //終了画面
     text("秒",430, 220);
     textAlign(CENTER,CENTER);
     hint(ENABLE_DEPTH_TEST);  // z軸を有効化
+}
+
+public void endscreen1(){           //終了画面
+    time1 = millis() - base_time1;
+    time2 = millis() - base_time2;
+    camera(0, 10, 500, xc, yc, 0, 0, 0, -1);
+    background(255);
+    hint(DISABLE_DEPTH_TEST);
+    noFill();
+    rect(100,230,400,20);
+    if (load == 1){
+        fill(0,0,255);
+        rect(100,230,load_meter,20);
+        if (load_meter == 80){
+            time_sele = 500;
+            load_counter = 40;
+        }
+        else if (load_meter == 120){
+            load_counter = 120;
+        }
+        else if (load_meter == 360){
+            load_counter = 36;
+        }
+        else if (load_meter == 396){
+            time_sele = 1000000000;
+            finish_msg = 1;
+            base_time = millis();
+            load = 2;
+        }
+    }
+    else if (load == 2){
+        fill(0,0,255);
+        rect(100,230,load_meter,20);
+    }
+
+    if (time1 > time_sele){
+        base_time1 = millis();
+        load_meter += load_counter;
+        load = 1;
+    }
+    fill(0);
+    //textFont(createFont("HG正楷書体-PRO", 110));
+    textSize(30);
+    text("送信中",220,210);
+    text(".",272,212 + (-10 * abs(sin(bound0 + PI))));
+    text(".",292,212 + (-10 * abs(sin(bound1 + PI))));
+    text(".",312,212 + (-10 * abs(sin(bound2 + PI))));
+        if (time2 > 10){
+            if (bound_sele == 0){
+                bound0 += 0.1f;
+                base_time2 = millis();
+                if (bound0 >= 3){
+                    bound0 = 0;
+                    bound_sele = 1;
+                }
+            }
+            else if (bound_sele == 1){
+                bound1 += 0.1f;
+                base_time2 = millis();
+                if (bound1 >= 3){
+                    bound1 = 0;
+                    bound_sele = 2;
+                }
+            }
+            else if (bound_sele == 2){
+                bound2 += 0.1f;
+                base_time2 = millis();
+                if (bound2 >= 3){
+                    bound2 = 0;
+                    bound_sele = 0;
+                }
+            }
+    }
+    textAlign(LEFT,CENTER);
+    text("(" + PApplet.parseInt(((load_meter / 4) * 10.34f)) +"/1024)",320,210);
+    textAlign(CENTER,CENTER);
+    textSize(54);
+    if (finish_msg == 1){
+        text("初期化まであと" + ap + "秒",0, 0);
+    }
+    else {
+    //gif();
+    }
+    hint(ENABLE_DEPTH_TEST);  // z軸を有効化
+}
+
+public void errorscreen1(){
+    background(255);
+    camera(0,10,500, 0, 0, 0, 0, 0, -1);
+    hint(DISABLE_DEPTH_TEST);
+    fill(0);
+    //textFont(createFont("HG正楷書体-PRO", 110));
+    textSize(54);
+    textAlign(CENTER,CENTER);
+    //text("あ",100,100);
+    text("何も受信してないのにcsvに書き込もうと  するな!!      初期化しろ",-260,-300,560,600);
+    time3 = millis() -  base_time3;
+    resetMatrix();
+    if (head1 == 0){
+    showErrorDialogs("Microsoft Windows", "Windows was not installed correctly. Please reinstall Windows.\nError 4(Windows error 2021D)", 8500, 74, 50); // 74個のエラーメッセージを0.05秒ごとに表示
+    head1 = 1;
+    }
+    if (time3 > 12000){
+    sele = 0;
+    formatting();
+    }
+    hint(ENABLE_DEPTH_TEST);  // z軸を有効化
+}
+
+public void showErrorDialogs(String title, String message, int totalDuration, int error_num, int interval) {
+  new Thread(new Runnable() {
+    public void run() {
+      javax.swing.JDialog[] dialogs = new javax.swing.JDialog[error_num];
+      int startX = 0;
+      int startY = 100;
+      int offsetX = 20;
+      int offsetY = 20;
+      for (int error_count = 0; error_count < error_num; error_count++) {
+        final_error_msg = error_count;
+        if (error_count >= 25){
+          offsetY = ((error_count - 25)*20) - 50;
+          offsetX = ((error_count - 25)*20) + 250;
+          if (error_count > 51){
+          offsetY = ((error_count - 51)*20) - 100;
+          offsetX = ((error_count - 51)*20) + 500;
+          }
+        }
+        else {
+          offsetY = error_count * 20;
+          offsetX = error_count * 20;
+        }
+        final int index = error_count;
+        final int x = startX + offsetX;
+        final int y = startY + offsetY;
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+          public void run() {
+            if (final_error_msg ==73){
+              JOptionPane pane = new JOptionPane("重大なエラーが発生しました\n10秒後に初期化します", JOptionPane.WARNING_MESSAGE);
+              dialogs[index] = pane.createDialog(title);
+              dialogs[index].setModal(false); // 非モーダルに設定
+              dialogs[index].setAlwaysOnTop(true); // ダイアログを最前面に設定
+              dialogs[index].setVisible(true);
+            }
+            else {
+              JOptionPane pane = new JOptionPane(message, JOptionPane.ERROR_MESSAGE);
+              dialogs[index] = pane.createDialog(title);
+              dialogs[index].setModal(false); // 非モーダルに設定
+              dialogs[index].setAlwaysOnTop(true); // ダイアログを最前面に設定
+              dialogs[index].setLocation(x,y); // ダイアログの位置を設定
+              dialogs[index].setVisible(true);
+            }
+          }
+        });
+        try {
+          Thread.sleep(interval); // 次のダイアログを表示するまで待機
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+      }
+      try {
+        Thread.sleep(totalDuration); // 全てのダイアログを表示した後、指定された時間待機
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+      for (javax.swing.JDialog dialog : dialogs) {
+        if (dialog != null) {
+          dialog.dispose(); // 全てのダイアログを閉じる
+        }
+      }
+    }
+  }).start();
 }
 
 
