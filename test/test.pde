@@ -24,11 +24,8 @@ int time;                   //時間
 String whatClientSaid;      //受信する型
 int count;                  //これまで繰り返した数
 
-
-
 void setup() {
     size(1366, 768, P3D);           //横1366，縦768の3D
-    //size(800, 600, P3D);          //横800，縦600の3D
     stroke(0);                      //線の色(白色)
     hint(ENABLE_DEPTH_SORT);        //P3DレンダラとOPENGLレンダラにおいて、プリミティブなzソートを有効にする．(よく分からん)
     lights();                       //デフォルトの環境光
@@ -38,12 +35,13 @@ void setup() {
     println("server address: " + server.ip());      //このパソコンのIPアドレスを表示
     formatting();                   //いろいろな数値を初期化
     count = 0;
+    
+    textFont(createFont("MS Mincho", 48, true));             //フォントをMS明朝にする．
 }
 
 void draw() {
     background(255);                        //背景を白にする
     translate(width / 2, height / 2,0);         //中心を決定
-    textFont(createFont("MS Mincho", 48, true));             //フォントをMS明朝にする．
     if (sele == 3) {
         exit();         //強制終了
     }
@@ -114,12 +112,6 @@ void draw() {
             // return;
         }
         if (unhex(so[0]) == 65535) {       //so[0]がFFFFなら
-            // if (i >= 10000) {          //10000個以上直線を描いたら終了
-            //     exit();
-        // }
-            // else{
-            //     //何もしない
-        // }
             if (head == 0) {          //1回目かAAAAの次
                 start[i] = new PVector(int(so[1]),int(so[2]),int(so[3]));
                 head = 1;
@@ -241,7 +233,7 @@ void startscreen() {         //初期画面
     camera(0,10,500, 0, 0, 0, 0, 0, -1);
     hint(DISABLE_DEPTH_TEST);
     fill(0);
-    textFont(createFont("HG正楷書体-PRO", 110));
+    // textFont(createFont("HG正楷書体-PRO", 110));
     textSize(54);
     text("ENTERキーを押して",0, 0);
     textAlign(CENTER,CENTER);
@@ -253,7 +245,7 @@ void endscreen() {           //終了画面
     background(255);
     hint(DISABLE_DEPTH_TEST);
     fill(0);
-    textFont(createFont("HG正楷書体 - PRO", 110));
+    // textFont(createFont("HG正楷書体 - PRO", 110));
     textSize(54);
     text("終了まであと",200, 220);
     text(ap,380, 220);

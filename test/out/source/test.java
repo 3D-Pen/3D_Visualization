@@ -43,11 +43,8 @@ int time;                   //時間
 String whatClientSaid;      //受信する型
 int count;                  //これまで繰り返した数
 
-
-
 public void setup() {
     /* size commented out by preprocessor */;           //横1366，縦768の3D
-    //size(800, 600, P3D);          //横800，縦600の3D
     stroke(0);                      //線の色(白色)
     hint(ENABLE_DEPTH_SORT);        //P3DレンダラとOPENGLレンダラにおいて、プリミティブなzソートを有効にする．(よく分からん)
     lights();                       //デフォルトの環境光
@@ -57,12 +54,13 @@ public void setup() {
     println("server address: " + server.ip());      //このパソコンのIPアドレスを表示
     formatting();                   //いろいろな数値を初期化
     count = 0;
+    
+    textFont(createFont("MS Mincho", 48, true));             //フォントをMS明朝にする．
 }
 
 public void draw() {
     background(255);                        //背景を白にする
     translate(width / 2, height / 2,0);         //中心を決定
-    textFont(createFont("MS Mincho", 48, true));             //フォントをMS明朝にする．
     if (sele == 3) {
         exit();         //強制終了
     }
@@ -113,23 +111,6 @@ public void draw() {
             strokeWeight(10);
             // 線を描く
             line(start[k].x, start[k].y, start[k].z, end[k].x, end[k].y, end[k].z);
-            // sphereDetail(1);
-            
-            // // 線の始点に球体を描画して丸い先端を再現
-            // pushMatrix();
-            // translate(start[k].x, start[k].y, start[k].z);
-            // noStroke();
-            // fill(0);// 球体の色
-            // sphere(3); // 球体のサイズ
-            // popMatrix();
-            
-            // // 線の終点にも同様に球体を描画
-            // pushMatrix();
-            // translate(end[k].x, end[k].y, end[k].z);
-            // noStroke();
-            // fill(0);// 球体の色
-            // sphere(3); // 球体のサイズ
-            // popMatrix();
         }
         
         //毎フレームごとに線を描く
@@ -150,12 +131,6 @@ public void draw() {
             // return;
         }
         if (unhex(so[0]) == 65535) {       //so[0]がFFFFなら
-            // if (i >= 10000) {          //10000個以上直線を描いたら終了
-            //     exit();
-        // }
-            // else{
-            //     //何もしない
-        // }
             if (head == 0) {          //1回目かAAAAの次
                 start[i] = new PVector(PApplet.parseInt(so[1]),PApplet.parseInt(so[2]),PApplet.parseInt(so[3]));
                 head = 1;
@@ -168,7 +143,7 @@ public void draw() {
             }
             base_time = millis();
         }
-
+        
         
         if (sele == 2) {
             end[i] = new PVector(PApplet.parseInt(so[1]),PApplet.parseInt(so[2]),PApplet.parseInt(so[3]));
@@ -277,7 +252,7 @@ public void startscreen() {         //初期画面
     camera(0,10,500, 0, 0, 0, 0, 0, -1);
     hint(DISABLE_DEPTH_TEST);
     fill(0);
-    textFont(createFont("HG正楷書体-PRO", 110));
+    // textFont(createFont("HG正楷書体-PRO", 110));
     textSize(54);
     text("ENTERキーを押して",0, 0);
     textAlign(CENTER,CENTER);
@@ -289,7 +264,7 @@ public void endscreen() {           //終了画面
     background(255);
     hint(DISABLE_DEPTH_TEST);
     fill(0);
-    textFont(createFont("HG正楷書体 - PRO", 110));
+    // textFont(createFont("HG正楷書体 - PRO", 110));
     textSize(54);
     text("終了まであと",200, 220);
     text(ap,380, 220);
