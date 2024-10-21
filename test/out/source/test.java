@@ -207,16 +207,11 @@ public void draw() {
         }
         ap = 5;
     }
-<<<<<<< Updated upstream
     else if (sele == 0) {
-        //startscreen1();
-        base_time1 = millis();
-        base_time2 = millis();
-        sele = 5;
-=======
-    else if(sele == 0){
-        startscreen();
->>>>>>> Stashed changes
+        startscreen1();
+        //base_time1 = millis();
+        //base_time2 = millis();
+        //sele = 5;
     }
 }
 public void mouseDragged() {            //マウスの割り込み
