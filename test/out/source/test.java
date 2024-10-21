@@ -42,14 +42,27 @@ int sele = 0;
 int time;                   //時間
 String whatClientSaid;      //受信する型
 int count;                  //これまで繰り返した数
+<<<<<<< HEAD
 
 public void setup() {
     /* size commented out by preprocessor */;           //横1366，縦768の3D
+=======
+
+
+
+public void setup() {
+    /* size commented out by preprocessor */;           //横1366，縦768の3D
+    //size(800, 600, P3D);          //横800，縦600の3D
+>>>>>>> cca5261d961bca841fd7141c0f9be73fed405085
     stroke(0);                      //線の色(白色)
     hint(ENABLE_DEPTH_SORT);        //P3DレンダラとOPENGLレンダラにおいて、プリミティブなzソートを有効にする．(よく分からん)
     lights();                       //デフォルトの環境光
     textSize(54);                   //テキストサイズを54
+<<<<<<< HEAD
     frameRate(60);                  //フレームレートを30
+=======
+    frameRate(30);                  //フレームレートを30
+>>>>>>> cca5261d961bca841fd7141c0f9be73fed405085
     server = new Server(this, port);
     println("server address: " + server.ip());      //このパソコンのIPアドレスを表示
     formatting();                   //いろいろな数値を初期化
@@ -60,6 +73,7 @@ public void setup() {
 
 public void draw() {
     background(255);                        //背景を白にする
+<<<<<<< HEAD
     translate(width / 2, height / 2,0);         //中心を決定
     if (sele == 3) {
         exit();         //強制終了
@@ -75,6 +89,23 @@ public void draw() {
         if (ap == 0) {
             sele = 0;       //初期画面に戻す
             for (int k = 0; k < i; k++) {
+=======
+    translate(width/2, height/2,0);         //中心を決定
+    textFont(createFont("MS Mincho", 48, true));             //フォントをMS明朝にする．
+    if (sele == 3){
+        exit();         //強制終了
+    }
+    else if (sele == 2){
+        time = millis() - base_time;        //時間を初期化
+        endscreen();
+        if (time >= 1000){      //1秒待つ
+            base_time = millis();
+            ap--;
+            }
+        if (ap == 0){
+            sele = 0;       //初期画面に戻す
+            for (int k = 0; k < i; k++){
+>>>>>>> cca5261d961bca841fd7141c0f9be73fed405085
                 start[k] = new PVector(0,0,0);      //配列を初期化
                 end[k] = new PVector(0,0,0);        //同上
             }
@@ -117,7 +148,11 @@ public void draw() {
         
         time = millis() - base_time;        //一定時間ごとにtimeを初期化
         Client client = server.available(); //clientに受信した信号を受け取る
+<<<<<<< HEAD
         if (client ==  null) {                  //何も信号が来なかったら
+=======
+        if(client ==null){                  //何も信号が来なかったら
+>>>>>>> cca5261d961bca841fd7141c0f9be73fed405085
             return;             //最初に戻る
         }
         else{
@@ -125,11 +160,16 @@ public void draw() {
         }
         whatClientSaid = client.readString();       //受信した文字列を収容
         String[] so = split(whatClientSaid, ',');   //コンマで区切られた文字列を分ける
+<<<<<<< HEAD
         if (unhex(so[0]) == 43690) {                 //AAAAならば
+=======
+        if(unhex(so[0]) == 43690) {                 //AAAAならば
+>>>>>>> cca5261d961bca841fd7141c0f9be73fed405085
             start[i] = new PVector(0,0,0);
             head = 0;
             // return;
         }
+<<<<<<< HEAD
         if (unhex(so[0]) == 65535) {       //so[0]がFFFFなら
             if (head == 0) {          //1回目かAAAAの次
                 start[i] = new PVector(PApplet.parseInt(so[1]),PApplet.parseInt(so[2]),PApplet.parseInt(so[3]));
@@ -150,6 +190,32 @@ public void draw() {
             i++;
             ln++;
             file = createWriter("csv/test_" + count + ".csv");  //csvファイルを順次作成
+=======
+        if(unhex(so[0]) == 65535){       //so[0]がFFFFなら
+                if(i >= 10000){          //10000個以上直線を描いたら終了
+                    exit();
+                }
+                else {
+                    //何もしない
+                }
+                if(head == 0){          //1回目かAAAAの次
+                    start[i] = new PVector(PApplet.parseInt(so[1]),PApplet.parseInt(so[2]),PApplet.parseInt(so[3]));
+                    head = 1;
+                }
+                else {
+                    end[i] = new PVector(PApplet.parseInt(so[1]),PApplet.parseInt(so[2]),PApplet.parseInt(so[3]));
+                    start[i + 1] = end[i];  //終端と先端を一致させる
+                    i++;
+                    ln++;       //1行増やす
+                }
+                base_time = millis();
+        }
+        else if(unhex(so[0]) == 4369){   //1111ならば
+            end[i] = new PVector(PApplet.parseInt(so[1]),PApplet.parseInt(so[2]),PApplet.parseInt(so[3]));
+            i++;
+            ln++;
+            file = createWriter("test_" + count + ".csv");  //csvファイルを順次作成
+>>>>>>> cca5261d961bca841fd7141c0f9be73fed405085
             makecsvfile();
             sele = 5;
             count++;
@@ -199,8 +265,13 @@ public void mouseWheel(MouseEvent e) {      //ホイールでサイズを変更
     }   
 }
 
+<<<<<<< HEAD
 public void keyPressed() {          //キーを押したら
     if (key == ENTER) {
+=======
+public void keyPressed(){          //キーを押したら
+    if (key == ENTER){
+>>>>>>> cca5261d961bca841fd7141c0f9be73fed405085
         sele = 1;
     }
     else if (key == TAB) {
@@ -214,7 +285,11 @@ public void keyPressed() {          //キーを押したら
     }
 }
 
+<<<<<<< HEAD
 public void formatting() {          //初期化
+=======
+public void formatting(){          //初期化
+>>>>>>> cca5261d961bca841fd7141c0f9be73fed405085
     head = 0;
     i = 0;
     ln = 0;             //行数を0にする
@@ -228,18 +303,30 @@ public void formatting() {          //初期化
     s = 0.7f;            //
 }
 
+<<<<<<< HEAD
 public void makecsvfile() {         //csvファイルの作成
     file.println(start[0].x + "," + start[0].y + "," + start[0].z);
     file.flush();
     for (int o = 0; o < ln - 1; o++) {
         if (start[o + 1].x == end[o].x && start[o + 1].y == end[o].y && start[o + 1].z == end[o].z) {//終端と先端が一致するなら
+=======
+public void makecsvfile(){         //csvファイルの作成
+    file.println(start[0].x + "," + start[0].y + "," + start[0].z);
+    file.flush();
+    for (int o = 0; o < ln - 1; o++){
+        if (start[o + 1].x == end[o].x && start[o + 1].y == end[o].y && start[o + 1].z == end[o].z){//終端と先端が一致するなら
+>>>>>>> cca5261d961bca841fd7141c0f9be73fed405085
             file.println(start[o + 1].x + "," + start[o + 1].y + "," + start[o + 1].z);
             file.flush();
         }
         else {
             file.println(end[o].x + "," + end[o].y + "," + end[o].z);
             file.println(jump + "," + jump + "," + jump);       //外れ値を出力
+<<<<<<< HEAD
             file.println(start[o + 1].x + "," + start[o + 1].y + "," + start[o + 1].z);
+=======
+            file.println(start[o + 1].x + "," + start[o + 1].y + "," + start[o +1].z);
+>>>>>>> cca5261d961bca841fd7141c0f9be73fed405085
             file.flush();
         }
     }
@@ -248,7 +335,11 @@ public void makecsvfile() {         //csvファイルの作成
     file.close();
 }
 
+<<<<<<< HEAD
 public void startscreen() {         //初期画面
+=======
+public void startscreen(){         //初期画面
+>>>>>>> cca5261d961bca841fd7141c0f9be73fed405085
     camera(0,10,500, 0, 0, 0, 0, 0, -1);
     hint(DISABLE_DEPTH_TEST);
     fill(0);
@@ -259,7 +350,11 @@ public void startscreen() {         //初期画面
     hint(ENABLE_DEPTH_TEST);  // z軸を有効化
 }
 
+<<<<<<< HEAD
 public void endscreen() {           //終了画面
+=======
+public void endscreen(){           //終了画面
+>>>>>>> cca5261d961bca841fd7141c0f9be73fed405085
     camera(0, 10, 500, xc, yc, 0, 0, 0, -1);
     background(255);
     hint(DISABLE_DEPTH_TEST);
