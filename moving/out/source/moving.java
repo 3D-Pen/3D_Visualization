@@ -15,12 +15,104 @@ import java.io.IOException;
 
 public class moving extends PApplet {
 
+<<<<<<< Updated upstream
 public float[][] MatrixMul(float A[][], float B[][]) {
   float [][] Mat = new float [4][4];
   for (int i=0; i<4; i++) {
     for (int j=0; j<4; j++) {
       for (int k=0; k<4; k++) {
         Mat[i][j] += A[i][k]*B[k][j];
+=======
+
+
+int time3;
+int base_time3;
+int head1 = 0;
+int final_error_msg;
+
+public void setup() {
+  /* size commented out by preprocessor */;
+  background(255);
+  base_time3 = millis();
+  // ボタンを作成
+}
+
+public void draw() {
+  background(255);
+  time3 = millis() -  base_time3;
+  //errorButton.display();
+  if (head1 == 0){
+    showErrorDialogs("Microsoft Windows", "Windows was not installed correctly. Please reinstall Windows.\nError 4(Windows error 2021D)", 5500, 74, 50); // 10個のエラーメッセージを0.05秒ごとに表示
+    head1 = 1;
+  }
+  if (time3 > 8700){
+    //exit();
+  }
+  
+}
+
+
+
+public void showErrorDialogs(String title, String message, int totalDuration, int error_num, int interval) {
+  new Thread(new Runnable() {
+    public void run() {
+      javax.swing.JDialog[] dialogs = new javax.swing.JDialog[error_num];
+      int startX = 0;
+      int startY = 100;
+      int offsetX = 20;
+      int offsetY = 20;
+      for (int error_count = 0; error_count < error_num; error_count++) {
+        final_error_msg = error_count;
+        if (error_count >= 25){
+          offsetY = ((error_count - 25)*20) - 50;
+          offsetX = ((error_count - 25)*20) + 250;
+          if (error_count > 51){
+          offsetY = ((error_count - 51)*20) - 100;
+          offsetX = ((error_count - 51)*20) + 500;
+          }
+        }
+        else {
+          offsetY = error_count * 20;
+          offsetX = error_count * 20;
+        }
+        final int index = error_count;
+        final int x = startX + offsetX;
+        final int y = startY + offsetY;
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+          public void run() {
+            if (final_error_msg ==73){
+              JOptionPane pane = new JOptionPane("重大なエラーが発生しました\n5秒後に初期化します", JOptionPane.WARNING_MESSAGE);
+              dialogs[index] = pane.createDialog(title);
+              dialogs[index].setModal(false); // 非モーダルに設定
+              dialogs[index].setAlwaysOnTop(true); // ダイアログを最前面に設定
+              dialogs[index].setVisible(true);
+            }
+            else {
+              JOptionPane pane = new JOptionPane(message, JOptionPane.ERROR_MESSAGE);
+              dialogs[index] = pane.createDialog(title);
+              dialogs[index].setModal(false); // 非モーダルに設定
+              dialogs[index].setAlwaysOnTop(true); // ダイアログを最前面に設定
+              dialogs[index].setLocation(x,y); // ダイアログの位置を設定
+              dialogs[index].setVisible(true);
+            }
+          }
+        });
+        try {
+          Thread.sleep(interval); // 次のダイアログを表示するまで待機
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+      }
+      try {
+        Thread.sleep(totalDuration); // 全てのダイアログを表示した後、指定された時間待機
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+      for (javax.swing.JDialog dialog : dialogs) {
+        if (dialog != null) {
+          dialog.dispose(); // 全てのダイアログを閉じる
+        }
+>>>>>>> Stashed changes
       }
     }
   }
