@@ -277,7 +277,7 @@ public void keyPressed() {          //キーを押したら
     else if (key == TAB) {
         base_time1 = millis();
         base_time2 = millis();
-        finish = 1;
+        //finish = 1;
         sele = 2;
     }
     else if (key == ESC) {

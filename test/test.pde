@@ -1,11 +1,10 @@
 import processing.net.*;    //processingソケット通信
-import processing.net.*;    //processingソケット通信
-import gifAnimation.*;      //(extrapixel/gif-animation at 3.0)をダウンロードし解凍してprocessingのlibrariesフォルダにgifAnimationをコピー
+//import gifAnimation.*;      //(extrapixel/gif-animation at 3.0)をダウンロードし解凍してprocessingのlibrariesフォルダにgifAnimationをコピー
 import javax.swing.JOptionPane;
 import java.awt.Point;
 
-GifMaker gifExport;
-final int NUMBER = 24;
+//GifMaker gifExport;
+//final int NUMBER = 24;
 
 int port = 10001;           //適当なポート番号(受信、送信で一致させる)
 Server server;              //Server型
@@ -550,18 +549,18 @@ void showErrorDialogs(String title, String message, int totalDuration, int error
   }).start();
 }
 
-void gif(){
-    for(int i = 0; i < NUMBER; i++){
-        float angle = i * 2*PI / NUMBER;
-        float v = pow(abs(sin(angle / 2 + frameCount * 0.03)), 4);
-        float r = map(v, 0, 1, 10, 20);
-        fill(0,0,0);
-        ellipse((150 + r) * cos(angle),(150 + r) * sin(angle), r * 2, r * 2);
-    }
-    if(frameCount <= 50*3){
-        gifExport.addFrame();
-    }
-    else {
-        gifExport.finish();
-    }
-}
+///void gif(){
+//    for(int i = 0; i < NUMBER; i++){
+//        float angle = i * 2*PI / NUMBER;
+//        float v = pow(abs(sin(angle / 2 + frameCount * 0.03)), 4);
+//        float r = map(v, 0, 1, 10, 20);
+//        fill(0,0,0);
+//        ellipse((150 + r) * cos(angle),(150 + r) * sin(angle), r * 2, r * 2);
+//    }
+//    if(frameCount <= 50*3){
+//        gifExport.addFrame();
+//    }
+//    else {
+//        gifExport.finish();
+//    }
+//}
