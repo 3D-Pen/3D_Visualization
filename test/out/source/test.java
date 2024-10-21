@@ -167,6 +167,7 @@ public void draw() {
             if (finish == 1){
                 base_time3 = millis();
                 sele = 4;
+                formatting();
             }
             return;             //最初に戻る
         }
@@ -206,11 +207,16 @@ public void draw() {
         }
         ap = 5;
     }
+<<<<<<< Updated upstream
     else if (sele == 0) {
         //startscreen1();
         base_time1 = millis();
         base_time2 = millis();
         sele = 5;
+=======
+    else if(sele == 0){
+        startscreen();
+>>>>>>> Stashed changes
     }
 }
 public void mouseDragged() {            //マウスの割り込み
@@ -355,8 +361,8 @@ public void startscreen1(){         //画面バウンド
     fill(0);
     textSize(54);
 
-    msg_speedX *=0.99f;
-    msg_speedY *=0.99f;
+    //msg_speedX *=0.99;
+    //msg_speedY *=0.99;
 
     msg_X += msg_speedX;
     msg_Y += msg_speedY;
@@ -502,7 +508,6 @@ public void errorscreen1(){
     }
     if (time3 > 12000){
     sele = 0;
-    formatting();
     }
     hint(ENABLE_DEPTH_TEST);  // z軸を有効化
 }
