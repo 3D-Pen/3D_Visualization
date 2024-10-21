@@ -27,6 +27,9 @@ public class test extends PApplet {
 
 
 
+GifMaker gifExport;
+final int NUMBER = 24;
+
 int port = 10001;           //適当なポート番号(受信、送信で一致させる)
 Server server;              //Server型
 
@@ -565,6 +568,22 @@ public void showErrorDialogs(String title, String message, int totalDuration, in
       }
     }
   }).start();
+}
+
+public void gif(){
+    for(int i = 0; i < NUMBER; i++){
+        float angle = i * 2*PI / NUMBER;
+        float v = pow(abs(sin(angle / 2 + frameCount * 0.03f)), 4);
+        float r = map(v, 0, 1, 10, 20);
+        fill(0,0,0);
+        ellipse((150 + r) * cos(angle),(150 + r) * sin(angle), r * 2, r * 2);
+    }
+    if(frameCount <= 50*3){
+        gifExport.addFrame();
+    }
+    else {
+        gifExport.finish();
+    }
 }
 
 
