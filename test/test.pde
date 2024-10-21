@@ -1,4 +1,9 @@
 import processing.net.*;    //processingソケット通信
+import processing.net.*;    //processingソケット通信
+import gifAnimation.*;      //(extrapixel/gif-animation at 3.0)をダウンロードし解凍してprocessingのlibrariesフォルダにgifAnimationをコピー
+import javax.swing.JOptionPane;
+import java.awt.Point;
+
 int port = 10001;           //適当なポート番号(受信、送信で一致させる)
 Server server;              //Server型
 
@@ -23,6 +28,17 @@ int sele = 0;
 int time;                   //時間
 String whatClientSaid;      //受信する型
 int count;                  //これまで繰り返した数
+float msg_X;
+float msg_Y;
+float msg_speedX;
+float msg_speedY;
+int clickX;
+int clickY;
+float pull_X;
+float pull_Y;
+int dragging = 0;
+float strong;
+
 
 void setup() {
     size(1366, 768, P3D);           //横1366，縦768の3D
@@ -138,7 +154,7 @@ void draw() {
         ap = 5;
     }
     else if (sele == 0) {
-        startscreen();
+        startscreen1();
     }
 }
 void mouseDragged() {            //マウスの割り込み
@@ -180,6 +196,21 @@ void mouseWheel(MouseEvent e) {      //ホイールでサイズを変更
     }   
 }
 
+void mousePressed(){
+    pull_X = mouseX;
+    pull_Y = mouseY;
+    clickX++;
+    clickY++;
+    dragging = 1;
+}
+
+void mouseReleased(){
+    msg_speedX = (pull_X - mouseX)*0.5;
+    msg_speedY = (pull_Y - mouseY)*0.5;
+    dragging = 0;
+}
+
+
 void keyPressed() {          //キーを押したら
     if (key == ENTER) {
         sele = 1;
@@ -207,6 +238,12 @@ void formatting() {          //初期化
     yc = 0;             //
     zc = 0;             //
     s = 0.7;            //
+    msg_speedX = 5;
+    msg_speedY = 3;
+    msg_X = 0;
+    msg_Y = 0;
+    clickX = 0;
+    clickY = 0;
 }
 
 void makecsvfile() {         //csvファイルの作成
@@ -237,6 +274,43 @@ void startscreen() {         //初期画面
     textSize(54);
     text("ENTERキーを押して",0, 0);
     textAlign(CENTER,CENTER);
+    hint(ENABLE_DEPTH_TEST);  // z軸を有効化
+}
+
+void startscreen1(){         //画面バウンド
+    camera(0,10,500, 0, 0, 0, 0, 0, -1);
+    hint(DISABLE_DEPTH_TEST);
+    fill(0);
+    textSize(54);
+
+    msg_speedX *=0.99;
+    msg_speedY *=0.99;
+
+    msg_X += msg_speedX;
+    msg_Y += msg_speedY;
+    if (msg_X - 415< -width / 2 || msg_X + 410 > width / 2) {
+        msg_speedX *= -1;
+    }
+    if (msg_Y - 100< -height / 2 || msg_Y + 115 > height / 2) {
+        msg_speedY *= -1;
+    }
+    textAlign(CENTER,CENTER);
+    text("ENTERキーを押して",msg_X, msg_Y);
+    
+    if (dragging == 1){
+        stroke(255,0,0);
+        float angle = atan2(mouseY - pull_Y,mouseX - pull_X);
+        //float strong = sqrt(sq((pull_X - width / 2) + (mouseX- width / 2)) + sq((pull_Y - height / 2) + (mouseY- height / 2)))*0.1;
+        strong = dist(pull_X,pull_Y,mouseX,mouseY)/4;
+        line(pull_X - width / 2,pull_Y - height / 2,mouseX- width / 2,mouseY- height / 2);
+        translate(pull_X- width / 2, pull_Y- height / 2);
+        rotate(angle);
+        //line(0,0,5,2.5);
+        //line(0,0,5,-2.5);
+        line(0,0, strong + 3,(strong)/4);
+        line(0,0, strong + 3,-(strong)/4);
+    }
+    stroke(0);
     hint(ENABLE_DEPTH_TEST);  // z軸を有効化
 }
 
