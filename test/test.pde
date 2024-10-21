@@ -63,7 +63,9 @@ int final_error_msg;
 
 
 void setup() {
-    size(1366, 768, P3D);           //横1366，縦768の3D
+    //size(1366, 768, P3D);           //横1366，縦768の3D
+    //size(displayWidth,displayHeight,P3D);
+    fullScreen(P3D);
     stroke(0);                      //線の色(白色)
     hint(ENABLE_DEPTH_SORT);        //P3DレンダラとOPENGLレンダラにおいて、プリミティブなzソートを有効にする．(よく分からん)
     lights();                       //デフォルトの環境光
@@ -141,11 +143,11 @@ void draw() {
         time = millis() - base_time;        //一定時間ごとにtimeを初期化
         Client client = server.available(); //clientに受信した信号を受け取る
         if (client ==  null) {                  //何も信号が来なかったら
-            if (finish == 1){
-                base_time3 = millis();
-                sele = 4;
-                formatting();
-            }
+            //if (finish == 1){
+            //    base_time3 = millis();
+            //    sele = 4;
+            //    formatting();
+            //}
             return;             //最初に戻る
         }
         else{
@@ -252,7 +254,7 @@ void keyPressed() {          //キーを押したら
     else if (key == TAB) {
         base_time1 = millis();
         base_time2 = millis();
-        finish = 1;
+        //finish = 1;
         sele = 2;
     }
     else if (key == ESC) {
