@@ -160,7 +160,10 @@ public void draw() {
         }
         remainingSeconds = 5;
     } else if (currentState == 0) {
-        displayStartScreen();
+        //displayStartScreen();
+        baseTime1 = millis();
+        baseTime2 = millis();
+        currentState = 5;
     }
 }
 
@@ -304,10 +307,10 @@ public void displayEndScreen1() {
     }
     fill(0);
     textSize(30);
-    text("送信中", 220, 210);
-    text(".", 272, 212 + ( -10 * abs(sin(loadingDot0 + PI))));
-    text(".", 292, 212 + ( -10 * abs(sin(loadingDot1 + PI))));
-    text(".", 312, 212 + ( -10 * abs(sin(loadingDot2 + PI))));
+    text("送信中", 218, 210);
+    text(".", 270, 212 + ( -10 * abs(sin(loadingDot0 + PI))));
+    text(".", 290, 212 + ( -10 * abs(sin(loadingDot1 + PI))));
+    text(".", 310, 212 + ( -10 * abs(sin(loadingDot2 + PI))));
     if (dotAnimationElapsedTime > 10) {
         if (loadingDotState == 0) {
             loadingDot0 += 0.1f;
@@ -333,7 +336,7 @@ public void displayEndScreen1() {
         }
     }
     textAlign(LEFT, CENTER);
-    text("(" + PApplet.parseInt(((loadingProgress / 4) * 10.34f)) + "/1024)", 320, 210);
+    text("(" + PApplet.parseInt(((loadingProgress / 4) * 10.34f)) + "/1024)", 318, 210);
     textAlign(CENTER, CENTER);
     textSize(54);
     hint(ENABLE_DEPTH_TEST);

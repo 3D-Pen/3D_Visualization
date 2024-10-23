@@ -7,7 +7,7 @@ z = np.arange(0, 20, 0.5)
 x = np.cos(z)
 y = np.sin(z)
 
-host = "10.101.99.136"  # Processingで立ち上げたサーバのIPアドレス
+host = "192.168.0.8"  # Processingで立ち上げたサーバのIPアドレス
 port = 10001  # Processingで設定したポート番号
 
 socket_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # オブジェクトの作成
