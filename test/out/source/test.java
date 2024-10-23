@@ -61,6 +61,7 @@ float loadingDot1;
 float loadingDot2;
 int loadingDotState;
 int isFinished;
+int[] c = new int[MAX_LINES];
 
 public void setup() {
     /* size commented out by preprocessor */;
@@ -119,7 +120,7 @@ public void draw() {
         strokeCap(ROUND);
         strokeWeight(10);
         for (int k = 0; k < lineCount; k++) {
-            stroke(0);
+            stroke(c[k]);
             strokeWeight(10);
             line(start[k].x, start[k].y, start[k].z, end[k].x, end[k].y, end[k].z);
         }
@@ -138,10 +139,12 @@ public void draw() {
             if (isFirstReceive == 0) {
                 start[lineCount] = new PVector(PApplet.parseInt(messageParts[1]), PApplet.parseInt(messageParts[2]), PApplet.parseInt(messageParts[3]));
                 isFirstReceive = 1;
+                c[lineCount] = PApplet.parseInt(0.5f * (PApplet.parseInt(200 - start[lineCount].y)));
             } else {
                 end[lineCount] = new PVector(PApplet.parseInt(messageParts[1]), PApplet.parseInt(messageParts[2]), PApplet.parseInt(messageParts[3]));
                 start[lineCount + 1] = end[lineCount];
                 lineCount++;
+                c[lineCount] = PApplet.parseInt(0.5f * (PApplet.parseInt(200 - start[lineCount].y)));
                 receivedLines++;
             }
             baseTime = millis();
@@ -215,9 +218,9 @@ public void initializeValues() {
     isFirstReceive = 0;
     lineCount = 0;
     receivedLines = 0;
-    prevRotationX = PI / 6;
+    prevRotationX = PI / 2;
     prevRotationZ = PI / 6;
-    rotationX = PI / 6;
+    rotationX = PI / 2;
     rotationZ = PI / 6;
     cameraX = 0;
     cameraY = 0;
@@ -234,6 +237,7 @@ public void initializeValues() {
     loadingDotState = 0;
     isFinished = 0;
     strokeWeight(1);
+    c[0] = 0;
 }
 
 public void createCSVFile() {
